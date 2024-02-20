@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRSPortal2", "QRSPortal2.csproj", "{4BCA22CA-3D21-4114-AD54-7669A02B59B7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4BCA22CA-3D21-4114-AD54-7669A02B59B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BCA22CA-3D21-4114-AD54-7669A02B59B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BCA22CA-3D21-4114-AD54-7669A02B59B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BCA22CA-3D21-4114-AD54-7669A02B59B7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FAFE454B-8AA0-4042-98D4-C08B1266EEEB}
+	EndGlobalSection
+EndGlobal

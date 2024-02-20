@@ -1,0 +1,27 @@
+﻿@{
+    ViewBag.Title = "Welcome";
+}
+
+<div class="jumbotron">
+   
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>Welcome to Quick Return System</h2>
+
+        <p>Maximize your returns and streamline your inventory management with our cutting-edge system.</p>
+
+        <p>Our platform empowers you to effortlessly submit returns for unsold items.</p>
+        @{
+            if (!Request.IsAuthenticated)
+            {
+                <p>Ready to take control of your inventory? @Html.ActionLink("Log In", "Login", "Account") now to access your account and start maximizing your returns.</p>
+
+            }
+        }
+
+
+
+    </div>
+</div>
