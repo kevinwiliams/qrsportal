@@ -105,6 +105,10 @@
 
 <script>
     var publicationDate = "";
+
+    function ReloadPage() {
+        location.reload();
+    }
     $(document).ready(function () {
         $('a[data-bs-toggle="modal"]').click(function () {
             //console.log($(this).find(':first-child').val());
@@ -134,6 +138,17 @@
                     data: returnsData,
                     success: function (result) {
                         console.log(result);
+
+                        swal({
+                            title: "Success!",
+                            text: "Returns updated!",
+                            type: "success",
+                            dangerMode: false
+                        });
+
+                        setTimeout(
+                            ReloadPage
+                            , 2000);
                         
                         // Clear the modal fields
                         $('#publicationDate').val('');

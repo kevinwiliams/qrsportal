@@ -26,6 +26,7 @@ namespace QRSPortal2
 
             bundles.Add(new Bundle("~/Scripts/js").Include(
                      //"~/Content/chart.js/chart.umd.js",
+                      "~/Scripts/sweetalert.min.js",
                      "~/Content/simple-datatables/simple-datatables.js",
                      "~/Scripts/main.js"));
 
@@ -36,6 +37,7 @@ namespace QRSPortal2
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
+                      "~/Content/sweetalert.css",
                       "~/Content/style.css",
                       "~/Content/site.css"));
         }
