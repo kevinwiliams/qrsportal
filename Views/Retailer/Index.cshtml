@@ -84,12 +84,22 @@
         </div>
     </div>
 </section>
-
+<input type="hidden" name="error" id="error" value="@TempData["Error"]" />
 @Scripts.Render("~/bundles/jquery")
 
 <script>
     $(document).ready(function () {
+        var showError = $('#error').val();
+            if (showError) {
+                swal({
+                title: "Error!",
+                text: "No records found for the account",
+                type: "warning",
+                dangerMode: true
+            });
+        }
 
+        console.log($('[name=error]').val())
         $('.dtRetailers').DataTable({
            order: [[0, 'desc']],
             pageLength: 15,

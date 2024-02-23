@@ -31,10 +31,13 @@
                                 <th>
                                     @Html.DisplayNameFor(model => model.ReturnAmount)
                                 </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.ConfirmedAmount)
+                                </th>
 
                                 @*<th>
-                        @Html.DisplayNameFor(model => model.ConfirmedAmount)
-                    </th>*@
+            @Html.DisplayNameFor(model => model.ConfirmedAmount)
+        </th>*@
 
                                 <th>
                                     @Html.DisplayNameFor(model => model.Status)
@@ -47,38 +50,42 @@
                             @foreach (var item in Model)
                             {
                                 var statusClass = (item.Status == "Closed") ? "bg-danger" : "bg-success";
-                                <tr>
+                            <tr>
 
-                                    <td>
-                                        <a href="#" data-bs-toggle="modal" data-bs-target="#returnDataModal">
-                                            @Html.DisplayFor(modelItem => item.PublicationDate)
-                                            @Html.HiddenFor(modelItem => item.PublicationDate)
-                                        </a>
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.DistributionAmount)
-                                    </td>
+                                <td>
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#returnDataModal">
+                                        @Html.DisplayFor(modelItem => item.PublicationDate)
+                                        @Html.HiddenFor(modelItem => item.PublicationDate)
+                                    </a>
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DistributionAmount)
+                                </td>
 
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.ReturnAmount)
-                                        @Html.HiddenFor(modelItem => item.ReturnAmount)
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ReturnAmount)
+                                    @Html.HiddenFor(modelItem => item.ReturnAmount)
+                                    @Html.HiddenFor(modelItem => item.ConfirmedAmount)
 
-                                    </td>
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ConfirmedAmount)
+                                </td>
 
-                                    @*<td>
-                            @Html.DisplayFor(modelItem => item.ConfirmedAmount)
-                        </td>*@
+                                @*<td>
+            @Html.DisplayFor(modelItem => item.ConfirmedAmount)
+        </td>*@
 
-                                    <td>
-                                        <span class="badge @statusClass">@Html.DisplayFor(modelItem => item.Status)</span>
-                                    </td>
-                                    <td>
-                                        <i class="bi bi-clipboard"></i>
-                                        @*<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                Enter Return Data
-                            </button>*@
-                                    </td>
-                                </tr>
+                                <td>
+                                    <span class="badge @statusClass">@Html.DisplayFor(modelItem => item.Status)</span>
+                                </td>
+                                <td>
+                                    <i class="bi bi-clipboard"></i>
+                                    @*<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Enter Return Data
+            </button>*@
+                                </td>
+                            </tr>
                             }
                         </tbody>
 
@@ -128,12 +135,14 @@
             //console.log($(this).find(':first-child').val());
             //console.log($(this));
             var returnAmt = $(this).closest('tr').find('input#item_ReturnAmount').val();
+            var confirmAmt = $(this).closest('tr').find('input#item_ConfirmedAmount').val();
             //console.log('returnAmt', returnAmt);
             publicationDate = $(this).find(':first-child').val();
             //console.log('pub: '+ publicationDate);
             $('#publicationDate').val(publicationDate);
             $('#pubDateModal').html( $('#publicationDate').val());
             $('#returnAmount').val(returnAmt);
+            $('#confirmAmount').val(confirmAmt);
 
             var parts = publicationDate.split(/[\s/:]/); // Split the date string using whitespace, "/", ":", and ":"
             var day = parseInt(parts[0], 10); // Extract the day (22)

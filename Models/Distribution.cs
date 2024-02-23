@@ -25,7 +25,7 @@ namespace QRSPortal2.Models
         [DataType(DataType.Date)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")] 
         public DateTime ConfirmDate { get; set; }
-        [Display(Name = "Confirmed")]
+        [Display(Name = "CFRM")]
         public int ConfirmedAmount { get; set; }
         public bool ConfirmReturn { get; set; }
         public string Status { get; set; }

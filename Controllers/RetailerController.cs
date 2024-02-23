@@ -14,6 +14,7 @@ namespace QRSPortal2.Controllers
         {
             try
             {
+                ViewData["Error"] = TempData["Error"];
                 using (var cxt = new ApplicationDbContext())
                 {
 

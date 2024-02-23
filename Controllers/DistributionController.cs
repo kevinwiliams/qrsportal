@@ -122,7 +122,7 @@ namespace QRSPortal2.Controllers
             }
             catch (Exception ex)
             {
-
+                TempData["Error"] = "error";
                 Util.LogError(ex);
                 return RedirectToAction("Index","Retailer");
             }
@@ -133,44 +133,59 @@ namespace QRSPortal2.Controllers
         [AllowAnonymous]
         public async Task<JsonResult> UpdateReturns(FormCollection frm)
         {
-            // Access form data using the collection parameter
-            string accountId = frm["accountId"];
-            string returnAmount = frm["returnAmount"];
-            string confirmAmount = frm["confirmAmount"];
-            string publicationDate = frm["publicationDate"];
-            string userRole = frm["userRole"];
-            DateTime parsedPublicationDate;
 
-            if (DateTime.TryParse(publicationDate, out parsedPublicationDate))
+            try
             {
-                using (var cxt = new ApplicationDbContext())
+                // Access form data using the collection parameter
+                string accountId = frm["accountId"];
+                string returnAmount = frm["returnAmount"];
+                string confirmAmount = frm["confirmAmount"];
+                string publicationDate = frm["publicationDate"];
+                string userRole = frm["userRole"];
+                DateTime parsedPublicationDate;
+
+                if (DateTime.TryParse(publicationDate, out parsedPublicationDate))
                 {
-                    var pubEntry = cxt.CircProTranx.FirstOrDefault(a => a.AccountID == accountId && a.PublicationDate == parsedPublicationDate);
-                    if (pubEntry != null)
+                    using (var cxt = new ApplicationDbContext())
                     {
-                        cxt.Entry(pubEntry).State = System.Data.Entity.EntityState.Modified;
-
-                        pubEntry.ReturnAmount = Convert.ToInt32(returnAmount);
-                        pubEntry.ReturnDate = DateTime.Now;
-                        pubEntry.UpdatedAt = DateTime.Now;
-
-                        if (userRole != "Retailer")
+                        var pubEntry = cxt.CircProTranx.FirstOrDefault(a => a.AccountID == accountId && a.PublicationDate == parsedPublicationDate);
+                        if (pubEntry != null)
                         {
-                            pubEntry.ConfirmedAmount = Convert.ToInt32(returnAmount);
-                            pubEntry.ConfirmDate = DateTime.Now;
+                            cxt.Entry(pubEntry).State = System.Data.Entity.EntityState.Modified;
+
+                            pubEntry.ReturnAmount = Convert.ToInt32(returnAmount);
+                            pubEntry.ReturnDate = DateTime.Now;
                             pubEntry.UpdatedAt = DateTime.Now;
-                            pubEntry.Status = "Closed";
-                            pubEntry.ConfirmReturn = true;
+
+                            if (userRole != "Retailer")
+                            {
+                                pubEntry.ConfirmedAmount = Convert.ToInt32(confirmAmount);
+                                pubEntry.ConfirmDate = DateTime.Now;
+                                pubEntry.UpdatedAt = DateTime.Now;
+                                pubEntry.Status = "Closed";
+                                pubEntry.ConfirmReturn = true;
+                            }
+                            await cxt.SaveChangesAsync();
+
+                            return Json(new { success = true });
+
                         }
-                        await cxt.SaveChangesAsync();
-
-                        return Json(new { success = true });
-
+                        else
+                        {
+                            return Json(new { success = false });
+                        }
                     }
                 }
-            }
 
                 return Json(new { success = false });
+            }
+            catch (Exception ex)
+            {
+
+                Util.LogError(ex);
+                return Json(new { success = false });
+            }
+           
         }
         // GET: Distribution/Create
         public ActionResult Create()
