@@ -1,0 +1,173 @@
+﻿@model IEnumerable<QRSPortal2.Models.DistributionData>
+
+@{
+    ViewBag.Title = "Account";
+}
+
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Account: @ViewData["AccountId"]</h5>
+                    <div class="row small mb-3">
+                        @*<div class="col-lg-3 col-md-4 label">Delivery Address</div>*@
+                        <div class="col-lg-9 col-md-8">@ViewData["Company"]<br>@ViewData["Address"]<br>@ViewData["Retailer"] </div>
+                    </div>
+
+
+                    <table class="table table-hover table-striped small dtDistributions">
+                        <thead>
+                            <tr>
+
+                                <th>
+                                    @Html.DisplayNameFor(model => model.PublicationDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.DistributionAmount)
+                                </th>
+
+                                <th>
+                                    @Html.DisplayNameFor(model => model.ReturnAmount)
+                                </th>
+
+                                @*<th>
+                                        @Html.DisplayNameFor(model => model.ConfirmedAmount)
+                                    </th>*@
+
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Status)
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                var statusClass = (item.Status == "Closed") ? "bg-danger" : "bg-success";
+                                <tr>
+
+                                    <td>
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#returnDataModal">
+                                            @Html.DisplayFor(modelItem => item.PublicationDate)
+                                            @Html.HiddenFor(modelItem => item.PublicationDate)
+                                        </a>
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DistributionAmount)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ReturnAmount)
+                                        @Html.HiddenFor(modelItem => item.ReturnAmount)
+
+                                    </td>
+
+                                    @*<td>
+                                            @Html.DisplayFor(modelItem => item.ConfirmedAmount)
+                                        </td>*@
+
+                                    <td>
+                                        <span class="badge @statusClass">@Html.DisplayFor(modelItem => item.Status)</span>
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-clipboard"></i>
+                                        @*<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                                Enter Return Data
+                                            </button>*@
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Delivery Modal -->
+@{Html.RenderPartial("_ReturnsModal"); }
+<!-- end: Delivery Modal -->
+
+
+@Scripts.Render("~/bundles/jquery")
+@*@Scripts.Render("~/bundles/jqueryval")*@
+@section scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+
+}
+
+
+
+<script>
+    var publicationDate = "";
+    $(document).ready(function () {
+        $('a[data-bs-toggle="modal"]').click(function () {
+            //console.log($(this).find(':first-child').val());
+            //console.log($(this));
+            var returnAmt = $(this).closest('tr').find('input#item_ReturnAmount').val();
+            //console.log('returnAmt', returnAmt);
+            publicationDate = $(this).find(':first-child').val();
+            //console.log('pub: '+ publicationDate);
+            $('#publicationDate').val(publicationDate);
+            $('#returnAmount').val(returnAmt);
+        });
+
+        $('#returnForm').submit(function (e) {
+            e.preventDefault();
+
+            let formData = $("[name=returnForm]").valid();
+            let Url = $("[name=returnForm]").data("request-url");
+            if (formData) {
+                //Serialize the form datas.   
+                var returnsData = $("[name=returnForm] :input").serialize();
+                console.log(returnsData);
+
+                $.ajax({
+                    type: "POST",
+                    url: Url,
+                    dataType: 'json',
+                    data: returnsData,
+                    success: function (result) {
+                        console.log(result);
+                        
+                        // Clear the modal fields
+                        $('#publicationDate').val('');
+                        $('#returnAmount').val('');
+                        $('#confirmAmount').val('');
+                        $('#confirmReturn').prop('checked', false);
+                        // Close the modal
+                        $('#returnDataModal').modal('hide');
+                        window.location.reload();
+                    }
+                });
+            }
+
+            // Get values from form fields
+            var returnAmount = $('#returnAmount').val();
+            //console.log('returnAmount - ' + returnAmount);
+            var confirmAmount = $('#confirmAmount').val();
+            //console.log('confirmAmount - ' + confirmAmount);
+            var accountId = $('#accountId').val();
+            //console.log('accountId - ' + accountId);
+            //console.log('publicationDate - ' + publicationDate);
+
+            // Do something with the values (e.g., send them to the server using AJAX)
+        });
+
+
+        $('.dtDistributions').DataTable({
+            //order: [[1, 'desc']],
+            "lengthChange": false,
+            "ordering": false,
+            //"bFilter": false,
+            pageLength: 30
+
+        });
+
+    });
+</script>

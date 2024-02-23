@@ -25,17 +25,17 @@ namespace QRSPortal2.ModelsDB
         public int DistributionAmount { get; set; }
         [DataType(DataType.Date)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
-        public DateTime ReturnDate { get; set; }
-        public int ReturnAmount { get; set; }
+        public Nullable<DateTime> ReturnDate { get; set; }
+        public Nullable<int> ReturnAmount { get; set; }
         [DataType(DataType.Date)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
-        public DateTime ConfirmDate { get; set; }
-        public int ConfirmedAmount { get; set; }
-        public bool ConfirmReturn { get; set; }
+        public Nullable<DateTime> ConfirmDate { get; set; }
+        public Nullable<int> ConfirmedAmount { get; set; }
+        public Nullable<bool> ConfirmReturn { get; set; }
         [StringLength(10)]
         public string Status { get; set; }
         public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public Nullable<DateTime> UpdatedAt { get; set; }
         [ForeignKey("UserID")]
         public CircproUsers CircproUser { get; set; }
     }

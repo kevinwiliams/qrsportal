@@ -1,0 +1,79 @@
+﻿@*@model QRSPortal2.Models.DistributionData*@
+
+@Html.AntiForgeryToken()
+
+
+<div class="modal fade" id="returnDataModal" name="returnDataModal" tabindex="-1" role="dialog" aria-labelledby="returnDataModalLabel"
+     aria-hidden="true" >
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="returnDataModalLabel">Enter Return Data</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="returnForm" name="returnForm" role="form" method="POST" class="g-3 needs-validation" data-request-url="@Url.Action("UpdateReturns","distribution")">
+                    <div class="form-group m-2">
+                        <label for="publicationDate">Publication Date</label>
+                        <input type="text" class="form-control" id="publicationDate" name="publicationDate" readonly>
+                        <input type="hidden" class="form-control" id="accountId" name="accountId" value="@ViewData["AccountId"]">
+                    </div>
+                    <div class="form-group m-2">
+                        <label for="returnAmount">Return Amount</label>
+                        <input type="number" class="form-control" id="returnAmount" name="returnAmount" required>
+                    </div>
+
+                    <div class="form-group m-2">
+                        <label for="confirmAmount">Confirm Amount</label>
+                        <input type="number" class="form-control" id="confirmAmount" name="confirmAmount">
+                    </div>
+
+                    <div class="form-check m-2">
+                        <input class="form-check-input" type="checkbox" id="confirmReturn" name="confirmReturn" required>
+                        <label class="form-check-label small" for="confirmReturn">
+                            Confirm Return Amount
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary m-2">Update</button>
+                </form>
+                <div class="row mt-5">
+                    <div class="col-12 align-content-center">
+                        @*<p class="small text-secondary">
+                                Last Updated: 2024-03-02 4:43pm<br>
+                                User: John Tom<br>
+                                Return: 9
+                            </p>*@
+                        <a class="small" href="@Url.Action("ShowHistory", "Home")">Show History</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (() => {
+        'use strict'
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })();
+
+
+
+</script>

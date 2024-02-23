@@ -19,17 +19,16 @@ namespace QRSPortal2.ModelsDB
         public string UserID { get; set; }
         [StringLength(10)]
         public string AccountID { get; set; }
-        [StringLength(10)]
-        public string DistributionID { get; set; }
+        public int DistributionID { get; set; }
         [StringLength(50)]
         public string EmailAddress { get; set; }
         [StringLength(50)]
         public string FirstName { get; set; }
-        [StringLength(50)]
+        [StringLength(100)]
         public string LastName { get; set; }
-        [StringLength(50)]
+        [StringLength(100)]
         public string Company { get; set; }
-        [StringLength(50)]
+        [StringLength(500)]
         public string PhoneNumber { get; set; }
         [StringLength(50)]
         public string CellNumber { get; set; }
@@ -42,8 +41,8 @@ namespace QRSPortal2.ModelsDB
         public Nullable<System.DateTime> LastLogin { get; set; }
 
         //Navigation properties
-        [ForeignKey("AccountID")]
-        public ApplicationUser ApplicationUser { get; set; }
+        [ForeignKey("UserID")]
+        public ApplicationUser ApplicationUser { get; set; } 
        
     }
 }

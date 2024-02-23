@@ -12,6 +12,7 @@
                 c => new
                     {
                         AddressID = c.Int(nullable: false, identity: true),
+                        UserID = c.String(maxLength: 128),
                         AccountID = c.String(maxLength: 128),
                         AddressType = c.String(maxLength: 5),
                         EmailAddress = c.String(maxLength: 50),
@@ -24,29 +25,32 @@
                         CreatedAt = c.DateTime(nullable: false),
                     })
                 .PrimaryKey(t => t.AddressID)
-                .ForeignKey("dbo.CircproUsers", t => t.AccountID)
-                .Index(t => t.AccountID);
+                .ForeignKey("dbo.CircproUsers", t => t.UserID)
+                .Index(t => t.UserID);
             
             CreateTable(
                 "dbo.CircproUsers",
                 c => new
                     {
-                        AccountID = c.String(nullable: false, maxLength: 128),
+                        UserID = c.String(nullable: false, maxLength: 128),
                         Id = c.Int(nullable: false, identity: true),
+                        AccountID = c.String(maxLength: 10),
+                        DistributionID = c.Int(nullable: false),
                         EmailAddress = c.String(maxLength: 50),
                         FirstName = c.String(maxLength: 50),
-                        LastName = c.String(maxLength: 50),
-                        Company = c.String(maxLength: 50),
-                        DateOfBirth = c.DateTime(),
+                        LastName = c.String(maxLength: 100),
+                        Company = c.String(maxLength: 100),
+                        PhoneNumber = c.String(maxLength: 500),
+                        CellNumber = c.String(maxLength: 50),
                         IpAddress = c.String(maxLength: 50),
                         IsActive = c.Boolean(nullable: false),
                         AddressID = c.Int(),
                         CreatedAt = c.DateTime(nullable: false),
                         LastLogin = c.DateTime(),
                     })
-                .PrimaryKey(t => t.AccountID)
-                .ForeignKey("dbo.AspNetUsers", t => t.AccountID)
-                .Index(t => t.AccountID)
+                .PrimaryKey(t => t.UserID)
+                .ForeignKey("dbo.AspNetUsers", t => t.UserID)
+                .Index(t => t.UserID)
                 .Index(t => t.Id, unique: true);
             
             CreateTable(
@@ -112,23 +116,42 @@
                 c => new
                     {
                         CircProTranxID = c.Int(nullable: false, identity: true),
+                        UserID = c.String(maxLength: 128),
                         AccountID = c.String(maxLength: 128),
                         EmailAddress = c.String(maxLength: 50),
                         DistributionTypeID = c.Int(nullable: false),
                         PublicationDate = c.DateTime(nullable: false),
                         DistributionAmount = c.Int(nullable: false),
-                        ReturnDate = c.DateTime(nullable: false),
-                        ReturnAmount = c.Int(nullable: false),
-                        ConfirmDate = c.DateTime(nullable: false),
-                        ConfirmedAmount = c.Int(nullable: false),
-                        ConfirmReturn = c.Boolean(nullable: false),
+                        ReturnDate = c.DateTime(),
+                        ReturnAmount = c.Int(),
+                        ConfirmDate = c.DateTime(),
+                        ConfirmedAmount = c.Int(),
+                        ConfirmReturn = c.Boolean(),
                         Status = c.String(maxLength: 10),
                         CreatedAt = c.DateTime(nullable: false),
-                        UpdatedAt = c.DateTime(nullable: false),
+                        UpdatedAt = c.DateTime(),
                     })
                 .PrimaryKey(t => t.CircProTranxID)
-                .ForeignKey("dbo.CircproUsers", t => t.AccountID)
-                .Index(t => t.AccountID);
+                .ForeignKey("dbo.CircproUsers", t => t.UserID)
+                .Index(t => t.UserID);
+            
+            CreateTable(
+                "dbo.QRSActivityLogs",
+                c => new
+                    {
+                        ActivityLogID = c.Int(nullable: false, identity: true),
+                        AccountID = c.String(),
+                        IPAddress = c.String(),
+                        LogInformation = c.String(),
+                        SystemInformation = c.String(),
+                        UserName = c.String(),
+                        EmailAddress = c.String(),
+                        PublicationDate = c.DateTime(nullable: false),
+                        ReturnAmount = c.Int(nullable: false),
+                        Status = c.String(maxLength: 10),
+                        CreatedAt = c.DateTime(nullable: false),
+                    })
+                .PrimaryKey(t => t.ActivityLogID);
             
             CreateTable(
                 "dbo.AspNetRoles",
@@ -145,23 +168,24 @@
         public override void Down()
         {
             DropForeignKey("dbo.AspNetUserRoles", "RoleId", "dbo.AspNetRoles");
-            DropForeignKey("dbo.CircProTransactions", "AccountID", "dbo.CircproUsers");
-            DropForeignKey("dbo.CircProAddresses", "AccountID", "dbo.CircproUsers");
-            DropForeignKey("dbo.CircproUsers", "AccountID", "dbo.AspNetUsers");
+            DropForeignKey("dbo.CircProTransactions", "UserID", "dbo.CircproUsers");
+            DropForeignKey("dbo.CircProAddresses", "UserID", "dbo.CircproUsers");
+            DropForeignKey("dbo.CircproUsers", "UserID", "dbo.AspNetUsers");
             DropForeignKey("dbo.AspNetUserRoles", "UserId", "dbo.AspNetUsers");
             DropForeignKey("dbo.AspNetUserLogins", "UserId", "dbo.AspNetUsers");
             DropForeignKey("dbo.AspNetUserClaims", "UserId", "dbo.AspNetUsers");
             DropIndex("dbo.AspNetRoles", "RoleNameIndex");
-            DropIndex("dbo.CircProTransactions", new[] { "AccountID" });
+            DropIndex("dbo.CircProTransactions", new[] { "UserID" });
             DropIndex("dbo.AspNetUserRoles", new[] { "RoleId" });
             DropIndex("dbo.AspNetUserRoles", new[] { "UserId" });
             DropIndex("dbo.AspNetUserLogins", new[] { "UserId" });
             DropIndex("dbo.AspNetUserClaims", new[] { "UserId" });
             DropIndex("dbo.AspNetUsers", "UserNameIndex");
             DropIndex("dbo.CircproUsers", new[] { "Id" });
-            DropIndex("dbo.CircproUsers", new[] { "AccountID" });
-            DropIndex("dbo.CircProAddresses", new[] { "AccountID" });
+            DropIndex("dbo.CircproUsers", new[] { "UserID" });
+            DropIndex("dbo.CircProAddresses", new[] { "UserID" });
             DropTable("dbo.AspNetRoles");
+            DropTable("dbo.QRSActivityLogs");
             DropTable("dbo.CircProTransactions");
             DropTable("dbo.AspNetUserRoles");
             DropTable("dbo.AspNetUserLogins");

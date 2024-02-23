@@ -17,7 +17,7 @@ namespace QRSPortal2.Migrations
             AutomaticMigrationDataLossAllowed = true;
         }
 
-        protected override void Seed(QRSPortal2.Models.ApplicationDbContext context)
+        protected override void Seed(ApplicationDbContext context)
         {
             //  This method will be called after migrating to the latest version.
 

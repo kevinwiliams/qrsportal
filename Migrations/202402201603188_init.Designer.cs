@@ -13,7 +13,7 @@ namespace QRSPortal2.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202402101843437_init"; }
+            get { return "202402201603188_init"; }
         }
         
         string IMigrationMetadata.Source

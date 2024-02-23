@@ -42,5 +42,6 @@ namespace QRSPortal2.Models
         public DbSet<CircProAddress> CircProAddress { get; set; }
         public DbSet<CircProTransactions> CircProTranx { get; set; }
         public DbSet<QRSActivityLog> QRSActivityLog { get; set; }
+        public DbSet<LogErrors> LogErrors { get; set; }
     }
 }

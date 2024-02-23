@@ -1,14 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
+using Newtonsoft.Json;
 using QRSPortal2.Models;
+using QRSPortal2.ModelsDB;
+using static QRSPortal2.Util;
 
 namespace QRSPortal2.Controllers
 {
@@ -17,15 +25,21 @@ namespace QRSPortal2.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private ApplicationRoleManager _roleManager;
+        private ApplicationDbContext _db;
 
         public AccountController()
         {
+            _db = new ApplicationDbContext();
+
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager, ApplicationRoleManager roleManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
+            RoleManager = roleManager;
+
         }
 
         public ApplicationSignInManager SignInManager
@@ -37,6 +51,17 @@ namespace QRSPortal2.Controllers
             private set 
             { 
                 _signInManager = value; 
+            }
+        }
+        public ApplicationRoleManager RoleManager
+        {
+            get
+            {
+                return _roleManager ?? HttpContext.GetOwinContext().Get<ApplicationRoleManager>();
+            }
+            private set
+            {
+                _roleManager = value;
             }
         }
 
@@ -139,6 +164,7 @@ namespace QRSPortal2.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
+            //await MigrateUsers();
             return View();
         }
 
@@ -211,10 +237,16 @@ namespace QRSPortal2.Controllers
 
                 // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
                 // Send an email with this link
-                // string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                // var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);		
+                string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);	
+                model.CallBackUrl = callbackUrl;
+
+                string subject = "Reset Password";
+                string body = RenderViewToString(this.ControllerContext, "~/Views/Emails/PasswordReset.cshtml", model);
+                await UserManager.SendEmailAsync(user.Id, subject, body);
+
                 // await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
-                // return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                return RedirectToAction("ForgotPasswordConfirmation", "Account");
             }
 
             // If we got this far, something failed, redisplay form
@@ -244,23 +276,31 @@ namespace QRSPortal2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return View(model);
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
+                var user = await UserManager.FindByNameAsync(model.Email);
+                if (user == null)
+                {
+                    // Don't reveal that the user does not exist
+                    return RedirectToAction("ResetPasswordConfirmation", "Account");
+                }
+                var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("ResetPasswordConfirmation", "Account");
+                }
+                AddErrors(result);
+                return View();
             }
-            var user = await UserManager.FindByNameAsync(model.Email);
-            if (user == null)
+            catch (HttpAntiForgeryException ex)
             {
-                // Don't reveal that the user does not exist
-                return RedirectToAction("ResetPasswordConfirmation", "Account");
+                LogError(ex);
+                return RedirectToAction("ResetPassword");
             }
-            var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
-            if (result.Succeeded)
-            {
-                return RedirectToAction("ResetPasswordConfirmation", "Account");
-            }
-            AddErrors(result);
-            return View();
         }
 
         //
@@ -391,8 +431,19 @@ namespace QRSPortal2.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult LogOff()
         {
-            AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
-            return RedirectToAction("Index", "Home");
+            try
+            {
+                Session.Clear();
+                AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+                return RedirectToAction("Index", "Home");
+            }
+            catch (HttpAntiForgeryException ex)
+            {
+                LogError(ex);
+                Session.Clear();
+                AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         //
@@ -403,6 +454,255 @@ namespace QRSPortal2.Controllers
             return View();
         }
 
+        public static string RenderViewToString<TModel>(ControllerContext controllerContext, string viewName, TModel model)
+        {
+            ViewEngineResult viewEngineResult = ViewEngines.Engines.FindView(controllerContext, viewName, null);
+            if (viewEngineResult.View == null)
+            {
+                throw new Exception("Could not find the View file. Searched locations:\r\n" + viewEngineResult.SearchedLocations);
+            }
+            else
+            {
+                IView view = viewEngineResult.View;
+
+                using (var stringWriter = new StringWriter())
+                {
+                    var viewContext = new ViewContext(controllerContext, view, new ViewDataDictionary<TModel>(model), new TempDataDictionary(), stringWriter);
+                    view.Render(viewContext, stringWriter);
+
+                    return stringWriter.ToString();
+                }
+            }
+        }
+
+        [NonAction]
+        public bool IsEmailExist(string emailAddress)
+        {
+
+            try
+            {
+                using (ApplicationDbContext dc = new ApplicationDbContext())
+                {
+                    var v = dc.CircproUsers.Where(a => a.EmailAddress == emailAddress).FirstOrDefault();
+                    return v != null;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+
+        public async Task<bool> MigrateUsers()
+        {
+
+            try
+            {
+                using (var context = new ApplicationDbContext())
+                {
+                    var sql = @"SELECT * FROM [QRS_DB].[dbo].[circproAgents]  WHERE EMAIL IS NOT NULL";
+                    var result = await context.Database.SqlQuery<CircProUserList>(sql).ToListAsync();
+
+                    foreach (var item in result)
+                    {
+                        var isExist = IsEmailExist(item.EMAIL);
+                        if (!isExist)
+                        {
+                            string UserID = "";
+                            int addressID = 0;
+                            var emailAddress = item.EMAIL;
+
+                            CircproUsers circProUsers = new CircproUsers
+                            {
+                                AccountID = item.ACCOUNT,
+                                //AddressID = item.ADDRESSID,
+                                CellNumber = item.CELL_NUMBER == "null" ? null : item.CELL_NUMBER,
+                                Company = item.COMPANY == "null" ? null : item.COMPANY,
+                                DistributionID = item.DISTRIBUTION_ID,
+                                EmailAddress = emailAddress,
+                                FirstName = item.FIRST_NAME == "null" ? null : item.FIRST_NAME,
+                                LastName = item.LAST_NAME == "null" ? null : item.LAST_NAME,
+                                PhoneNumber = item.PHONE_NUMBER == "null" ? null : item.PHONE_NUMBER,
+                                CreatedAt = DateTime.Now,
+                                IsActive = true
+                            };
+
+                            CircProAddress circProAddress = new CircProAddress 
+                            { 
+                                AccountID = item.ACCOUNT,
+                                EmailAddress = emailAddress,
+                                AddressLine1 = item.ADDRESS_LINE1 == "null" ? null : item.ADDRESS_LINE1,
+                                AddressLine2 = item.ADDRESS_LINE2 == "null" ? null : item.ADDRESS_LINE2,
+                                CityTown = item.ADDRESS_LINE3 == "null" ? null : item.ADDRESS_LINE3,
+                                CreatedAt = DateTime.Now,
+
+                            };
+
+                            var newAccount = new ApplicationUser 
+                            { 
+                                UserName = emailAddress,
+                                Email = emailAddress,
+                                CircproUser = circProUsers
+                            };
+                            //create application user
+                            var createAccount = await UserManager.CreateAsync(newAccount, "Password-01!");
+                            if (createAccount.Succeeded) 
+                            {
+                                UserID = newAccount.Id;
+                                var userRole = (newAccount.Email.ToLower().Contains("jamaicaobserver.com")) ? "Circulation" : "Retailer";
+
+                                //assign User Role
+                                createAccount = await UserManager.AddToRoleAsync(UserID, userRole);
+                                circProAddress.UserID = UserID;
+                                context.CircProAddress.Add(circProAddress);
+                                await context.SaveChangesAsync();
+
+                                //Get Address ID
+                                addressID = circProAddress.AddressID;
+
+                                //update subscribers table w/ address ID
+                                var circUser = context.CircproUsers.SingleOrDefault(b => b.UserID == UserID);
+                                if (circUser != null)
+                                {
+                                    circUser.AddressID = addressID;
+                                    await context.SaveChangesAsync();
+                                }
+
+                                AddErrors(createAccount);
+
+                            }
+
+                        }
+                    }
+
+                    var sqlTrans = @"SELECT *  FROM [QRS_DB].[dbo].[circProDistro] WHERE [DISTRIBUTION_ID] IN (SELECT [DistributionID] FROM [CircproUsers] c JOIN [AspNetUsers] a on c.[UserID] = a.Id WHERE [EMAIL] IS NOT NULL)";
+                    var resultTrans = await context.Database.SqlQuery<CircProDistribution>(sqlTrans).ToListAsync();
+
+                    foreach (var item in resultTrans)
+                    {
+
+                        var circUser = context.CircproUsers.SingleOrDefault(b => b.DistributionID == item.DISTRIBUTION_ID);
+
+                        CircProTransactions circProTransactions = new CircProTransactions
+                        { 
+                            UserID = circUser.UserID,
+                            AccountID = item.DIST_ACCTNBR,
+                            PublicationDate = item.PUBLISH,
+                            ConfirmDate = item.PUBLISH,
+                            ConfirmedAmount = item.RETTOT,
+                            ConfirmReturn = true,
+                            CreatedAt = item.PUBLISH,
+                            UpdatedAt = DateTime.Now,
+                            Status = "Closed",
+                            EmailAddress = circUser.EmailAddress,
+                            ReturnAmount = item.RETTOT,
+                            ReturnDate = item.PUBLISH,
+                            DistributionAmount = item.DRAWTOT,
+                            DistributionTypeID = item.DISTRIBUTION_TYPE_ID
+                        };
+
+                        context.CircProTranx.Add(circProTransactions);
+                        await context.SaveChangesAsync();
+                    }
+                }
+                    return true;
+
+            }
+            catch (Exception ex)
+            {
+
+                //throw ex;
+                return false;
+            }
+        }
+
+        public async Task<bool> LoadTransactions(string accountID, string startDate, string endDate)
+        {
+
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    // Define the URL of the ASP page
+                    string url = "https://janus.jamaicaobserver.com/circ/api_acct_date.asp";
+
+                    // Define your form data as key-value pairs
+                    var formData = new Dictionary<string, string>
+                    {
+                        { "account_id", accountID },
+                        { "startDate", startDate },
+                        { "endDate", endDate }
+                    };
+
+                    // Encode the form data
+                    var encodedFormData = new FormUrlEncodedContent(formData);
+
+                    // Set Content-Type header
+                    encodedFormData.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
+
+                    // Send the POST request and get the response
+                    HttpResponseMessage response = await client.PostAsync(url, encodedFormData);
+
+                    // Check if the request was successful
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Read the response content
+                        //string responseContent = await response.Content.ReadAsStringAsync();
+                        var context = new ApplicationDbContext();
+                        var json = await response.Content.ReadAsStringAsync();
+                        var resultTrans = JsonConvert.DeserializeObject<List<CircProDistribution>>(json);
+
+                        foreach (var item in resultTrans)
+                        {
+                            // Assuming circUser is retrieved successfully using DistributionID
+                            var circUser = context.CircproUsers.SingleOrDefault(b => b.DistributionID == item.DISTRIBUTION_ID);
+
+                            if (circUser != null)
+                            {
+                                CircProTransactions circProTransactions = new CircProTransactions
+                                {
+                                    UserID = circUser.UserID,
+                                    AccountID = item.DIST_ACCTNBR,
+                                    PublicationDate = item.PUBLISH,
+                                    ConfirmDate = item.PUBLISH,
+                                    ConfirmedAmount = item.RETTOT,
+                                    ConfirmReturn = true,
+                                    CreatedAt = item.PUBLISH,
+                                    UpdatedAt = DateTime.Now,
+                                    Status = "Closed",
+                                    EmailAddress = circUser.EmailAddress,
+                                    ReturnAmount = item.RETTOT,
+                                    ReturnDate = item.PUBLISH,
+                                    DistributionAmount = item.DRAWTOT,
+                                    DistributionTypeID = item.DISTRIBUTION_TYPE_ID
+                                };
+
+                                context.CircProTranx.Add(circProTransactions);
+                                await context.SaveChangesAsync();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // If the request was not successful, output the status code
+                        Console.WriteLine($"Request failed with status code {response.StatusCode}");
+                        return true;
+                    }
+                }
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+
+                //throw ex;
+                LogError(ex);
+                return false;
+            }
+        }
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -418,9 +718,20 @@ namespace QRSPortal2.Controllers
                     _signInManager.Dispose();
                     _signInManager = null;
                 }
+
+                if (_roleManager != null)
+                {
+                    _roleManager.Dispose();
+                    _roleManager = null;
+                }
             }
 
             base.Dispose(disposing);
+        }
+
+        public void InitializeController(RequestContext context)
+        {
+            base.Initialize(context);
         }
 
         #region Helpers

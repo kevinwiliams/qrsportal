@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QRSPortal2.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -11,6 +12,33 @@ namespace QRSPortal2.Controllers
         [Authorize]
         public ActionResult Index()
         {
+            if (Request.IsAuthenticated)
+            {
+
+                if (User.IsInRole("Retailer") || User.IsInRole("Admin"))
+                {
+                    try
+                    {
+                        using (ApplicationDbContext dc = new ApplicationDbContext())
+                        {
+                            var accountId = dc.CircproUsers.Where(a => a.EmailAddress == User.Identity.Name).FirstOrDefault();
+
+                            if (accountId != null)
+                            {
+                                return RedirectToAction("account", "distribution", new { id = accountId.AccountID });
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+
+                        throw ex;
+                    }
+
+                }
+                //return RedirectToAction("dashboard", "account");
+            }
+
             return View();
         }
 
