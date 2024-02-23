@@ -108,6 +108,7 @@ namespace QRSPortal2.Controllers
                         ViewData["Company"] = result.FirstOrDefault().Company;
                         ViewData["Address"] = result.FirstOrDefault().RetailerAddress;
                         ViewData["Retailer"] = result.FirstOrDefault().RetailerName;
+                        ViewData["UserRole"] = (User.IsInRole("Retailer") ? "Retailer" : (User.IsInRole("Circulation") ? "Circulation" : (User.IsInRole("Supervisor") ? "Supervisor" : "Admin")));
                     }
                     else
                     {
@@ -137,6 +138,7 @@ namespace QRSPortal2.Controllers
             string returnAmount = frm["returnAmount"];
             string confirmAmount = frm["confirmAmount"];
             string publicationDate = frm["publicationDate"];
+            string userRole = frm["userRole"];
             DateTime parsedPublicationDate;
 
             if (DateTime.TryParse(publicationDate, out parsedPublicationDate))
@@ -152,6 +154,14 @@ namespace QRSPortal2.Controllers
                         pubEntry.ReturnDate = DateTime.Now;
                         pubEntry.UpdatedAt = DateTime.Now;
 
+                        if (userRole != "Retailer")
+                        {
+                            pubEntry.ConfirmedAmount = Convert.ToInt32(returnAmount);
+                            pubEntry.ConfirmDate = DateTime.Now;
+                            pubEntry.UpdatedAt = DateTime.Now;
+                            pubEntry.Status = "Closed";
+                            pubEntry.ConfirmReturn = true;
+                        }
                         await cxt.SaveChangesAsync();
 
                         return Json(new { success = true });

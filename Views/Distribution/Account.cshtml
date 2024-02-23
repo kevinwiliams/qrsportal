@@ -33,8 +33,8 @@
                                 </th>
 
                                 @*<th>
-                                        @Html.DisplayNameFor(model => model.ConfirmedAmount)
-                                    </th>*@
+                        @Html.DisplayNameFor(model => model.ConfirmedAmount)
+                    </th>*@
 
                                 <th>
                                     @Html.DisplayNameFor(model => model.Status)
@@ -66,8 +66,8 @@
                                     </td>
 
                                     @*<td>
-                                            @Html.DisplayFor(modelItem => item.ConfirmedAmount)
-                                        </td>*@
+                            @Html.DisplayFor(modelItem => item.ConfirmedAmount)
+                        </td>*@
 
                                     <td>
                                         <span class="badge @statusClass">@Html.DisplayFor(modelItem => item.Status)</span>
@@ -75,8 +75,8 @@
                                     <td>
                                         <i class="bi bi-clipboard"></i>
                                         @*<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                                Enter Return Data
-                                            </button>*@
+                                Enter Return Data
+                            </button>*@
                                     </td>
                                 </tr>
                             }
@@ -105,6 +105,20 @@
 
 <script>
     var publicationDate = "";
+    var userRole = $('#userRole').val();
+    console.log('userRole: ' + userRole);
+
+    if (userRole === "Retailer") {
+        // Show admin-specific content
+        $("[for=confirmAmount").hide();
+        $("#confirmAmount").hide();
+    } else {
+        // Show user-specific content
+        //$(".admin-content").hide();
+        $("#confirmAmount").show();
+        $("#confirmAmount").prop("required", true);
+    }
+
 
     function ReloadPage() {
         location.reload();
@@ -118,7 +132,34 @@
             publicationDate = $(this).find(':first-child').val();
             //console.log('pub: '+ publicationDate);
             $('#publicationDate').val(publicationDate);
+            $('#pubDateModal').html( $('#publicationDate').val());
             $('#returnAmount').val(returnAmt);
+
+            var parts = publicationDate.split(/[\s/:]/); // Split the date string using whitespace, "/", ":", and ":"
+            var day = parseInt(parts[0], 10); // Extract the day (22)
+            var month = parseInt(parts[1], 10); // Extract the month (2)
+            var year = parseInt(parts[2], 10); // Extract the year (2024)
+
+            // Adjust month index since JavaScript Date object months are zero-based (0-11)
+            month -= 1;
+
+            // Create a new Date object with the extracted year, month, and day
+            var date = new Date(year, month, day);
+            console.log(publicationDate);
+            // Define days and months arrays
+            var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+            // Extract day, month, and year from the Date object
+            var dayOfWeek = days[date.getDay()];
+            var dayOfMonth = date.getDate();
+            var month = months[date.getMonth()];
+            var year = date.getFullYear();
+
+            // Concatenate day, month, and year in the desired format
+            var formattedDate = dayOfWeek + ", " + dayOfMonth + "-" + month + "-" + year;
+            $('#pubDateModal').html(formattedDate);
+
         });
 
         $('#returnForm').submit(function (e) {
@@ -157,29 +198,15 @@
                         $('#confirmReturn').prop('checked', false);
                         // Close the modal
                         $('#returnDataModal').modal('hide');
-                        window.location.reload();
                     }
                 });
             }
-
-            // Get values from form fields
-            var returnAmount = $('#returnAmount').val();
-            //console.log('returnAmount - ' + returnAmount);
-            var confirmAmount = $('#confirmAmount').val();
-            //console.log('confirmAmount - ' + confirmAmount);
-            var accountId = $('#accountId').val();
-            //console.log('accountId - ' + accountId);
-            //console.log('publicationDate - ' + publicationDate);
-
-            // Do something with the values (e.g., send them to the server using AJAX)
         });
 
 
         $('.dtDistributions').DataTable({
-            //order: [[1, 'desc']],
             "lengthChange": false,
             "ordering": false,
-            //"bFilter": false,
             pageLength: 30
 
         });
