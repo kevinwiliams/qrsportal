@@ -1,10 +1,9 @@
-﻿@*@model QRSPortal2.Models.DistributionData*@
-
+﻿
 @Html.AntiForgeryToken()
 
 
 <div class="modal fade" id="returnDataModal" name="returnDataModal" tabindex="-1" role="dialog" aria-labelledby="returnDataModalLabel"
-     aria-hidden="true" >
+     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -43,18 +42,26 @@
                 </form>
                 <div class="row mt-5">
                     <div class="col-12 align-content-center">
+                        <input type="hidden" class="form-control" id="lastUpdated" name="lastUpdated">
+                        <input type="hidden" class="form-control" id="updatedUserName" name="updatedUserName">
+                        <input type="hidden" class="form-control" id="updatedAmount" name="updatedAmount">
+
                         @*<p class="small text-secondary">
                                 Last Updated: 2024-03-02 4:43pm<br>
                                 User: John Tom<br>
                                 Return: 9
                             </p>*@
-                        <a class="small" href="@Url.Action("ShowHistory", "Home")">Show History</a>
+
+                        @*<a class="small" href="@Url.Action("History", "Activity", new { id = ViewData["AccountId"], pd = ViewData["PubDate"] })">Show History</a>*@
+                        <a id="historyLink" class="small" href="#">Show History</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/jqueryval")
 
 <script>
     // Example starter JavaScript for disabling form submissions if there are invalid fields
@@ -76,7 +83,23 @@
             }, false)
         })
     })();
+    </script>
+<script>
 
+    $(function () {
+        // Event listener for modal open event
+        $('#returnDataModal').on('shown.bs.modal', function () {
+            //alert();
+            // Fetch the PubDate dynamically (replace this with your logic)
+            var pubDate = $('#publicationDate').val(); // Assuming you have an input field for PubDate
+            var formattedPubDate = encodeURIComponent(pubDate.replace(/\//g, '-'));
+            // Get the URL for the History action method with the PubDate parameter
+            var url = '@Url.Action("History", "Activity", new { id = ViewData["AccountId"] })';
+            url += '?pd=' + formattedPubDate; // Append the PubDate parameter to the URL
 
+            // Update the href attribute of the link with the dynamically generated URL
+            $('#historyLink').attr('href', url);
+        });
+    });
 
 </script>

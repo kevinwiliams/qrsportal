@@ -34,11 +34,6 @@
                                 <th class="text-center">
                                     @Html.DisplayNameFor(model => model.ConfirmedAmount)
                                 </th>
-
-                                @*<th>
-            @Html.DisplayNameFor(model => model.ConfirmedAmount)
-        </th>*@
-
                                 <th class="text-center">
                                     @Html.DisplayNameFor(model => model.Status)
                                 </th>
@@ -87,7 +82,9 @@
                                     <span class="badge @statusClass">@Html.DisplayFor(modelItem => item.Status)</span>
                                 </td>
                                 <td class="text-center">
-                                    <i class="bi bi-clipboard"></i>
+                                    <a href="@Url.Action("History", "Activity", new { id = item.AccountID, pd = item.PublicationDate.ToString("yyyy-MM-dd") })">
+                                        <i class="bi bi-clipboard"></i>
+                                    </a>
                                 </td>
                             </tr>
                             }
