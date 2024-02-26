@@ -7,6 +7,7 @@ using System.Web.Mvc;
 
 namespace QRSPortal2.Controllers
 {
+    [Authorize(Roles = "Admin, Circulation, Supervisor")]
     public class RetailerController : Controller
     {
         // GET: Retailer
@@ -123,5 +124,6 @@ namespace QRSPortal2.Controllers
                 return View();
             }
         }
+
     }
 }

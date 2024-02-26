@@ -27,7 +27,7 @@ namespace QRSPortal2.Controllers
 
             if (DateTime.TryParse(pd, out parsedPubDate)) 
             {
-                qRSActivityLogs = _db.QRSActivityLog.AsNoTracking().Where(x => x.AccountID == id && x.PublicationDate == parsedPubDate).ToList();
+                qRSActivityLogs = _db.QRSActivityLog.AsNoTracking().Where(x => x.AccountID == id && x.PublicationDate == parsedPubDate).OrderByDescending(x => x.CreatedAt).ToList();
                 ViewData["PublicationDate"] = parsedPubDate.ToString("yyyy-MMM-dd");
                 return View(qRSActivityLogs);
             }
@@ -48,15 +48,19 @@ namespace QRSPortal2.Controllers
             if (DateTime.TryParse(publicationDate, out parsedPublicationDate))
             {
 
-                var result = _db.QRSActivityLog.AsNoTracking().Where(x => x.AccountID == accountId && x.PublicationDate == parsedPublicationDate).ToList();
+                var result = _db.QRSActivityLog.AsNoTracking().Where(x => x.AccountID == accountId && x.PublicationDate == parsedPublicationDate).OrderByDescending(x => x.CreatedAt).ToList();
                 if (result != null)
                 {
-                    response = Json(new
+                    if (result.Count > 0)
                     {
-                        LASTUPDATED = result.FirstOrDefault().CreatedAt.ToString("yyyy-mm-dd h:mm tt"),
-                        RETAMT = result.FirstOrDefault().ReturnAmount,
-                        USER = result.FirstOrDefault().UserName
-                    });
+                        response = Json(new
+                        {
+                            LASTUPDATED = result.FirstOrDefault().CreatedAt.ToString("yyyy-mm-dd h:mm tt"),
+                            RETAMT = result.FirstOrDefault().ReturnAmount,
+                            USER = result.FirstOrDefault().UserName
+                        });
+                    }
+                    
                 }
 
             }

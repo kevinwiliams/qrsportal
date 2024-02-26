@@ -113,40 +113,31 @@
             <aside id="sidebar" class="sidebar">
 
                 <ul class="sidebar-nav" id="sidebar-nav">
+                    @{
+                        if (User.IsInRole("Circulation") || User.IsInRole("Admin") || User.IsInRole("Supervisor"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link collapsed" href=" @Url.Action("Index", "Home")">
+                                    <i class="bi bi-grid"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link collapsed" href=" @Url.Action("Index", "Retailer")">
+                                    <i class="bi bi-layout-text-window-reverse"></i>
+                                    <span>Agents</span>
+                                </a>
+                            </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link collapsed" href=" @Url.Action("Index", "Home")">
-                            <i class="bi bi-grid"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link collapsed" href=" @Url.Action("Index", "Retailer")">
-                            <i class="bi bi-layout-text-window-reverse"></i>
-                            <span>Agents</span>
-                        </a>
-                    </li>
-                    <!--
-                    <li class="nav-item">
-                        <a class="nav-link collapsed" href=" @Url.Action("Circulation", "Home")">
-                            <i class="bi bi-layout-text-window-reverse"></i>
-                            <span>Circulation</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link collapsed" href=" @Url.Action("Retailer", "Home")">
-                            <i class="bi bi-journal-text"></i>
-                            <span>Retailer</span>
-                        </a>
-                    </li>
-                        -->
-                    <li class="nav-item">
-                        <a class="nav-link collapsed" href=" #">
-                            <i class="bi bi-clipboard2-data"></i>
-                            <span>Reports</span>
-                        </a>
-                    </li>
+                            <li class="nav-item">
+                                <a class="nav-link collapsed" href=" #">
+                                    <i class="bi bi-clipboard2-data"></i>
+                                    <span>Reports</span>
+                                </a>
+                            </li>
+                        }
 
+                    }
 
                     <!-- End Dashboard Nav -->
 

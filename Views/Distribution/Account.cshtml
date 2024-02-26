@@ -133,6 +133,8 @@
     var hideColumn = (userRole == "Retailer") ? true : false;
     $(document).ready(function () {
         $('a[data-bs-toggle="modal"]').click(function () {
+
+            $('#historyData').hide();
             //console.log($(this).find(':first-child').val());
             //console.log($(this));
             var returnAmt = $(this).closest('tr').find('input#item_ReturnAmount').val();

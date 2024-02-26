@@ -38,16 +38,16 @@
                             Confirm Return Amount
                         </label>
                     </div>
-                    <button type="submit" class="btn btn-primary m-2">Update</button>
+                    <button type="submit" class="btn btn-primary m-2 mb-0">Update</button>
                 </form>
-                <div class="row mt-5">
+                <div class="row mt-4">
                     <div class="col-12 align-content-center">
                         <input type="hidden" class="form-control" id="lastUpdated" name="lastUpdated">
                         <input type="hidden" class="form-control" id="updatedUserName" name="updatedUserName">
                         <input type="hidden" class="form-control" id="updatedAmount" name="updatedAmount">
 
                         <p class="small text-secondary" id="historyData" name="historyData">
-                                Last Updated: <span id="lastUpdate"></span><br>
+                                Updated: <span id="lastUpdate"></span><br>
                                 User: <span id="lastUser"></span><br>
                                 Return: <span id="lastRet"></span>
                             </p>
@@ -85,38 +85,53 @@
     })();
     </script>
 <script>
+    function isEmptyObject(obj) {
+        return Object.keys(obj).length === 0;
+    }
 
     $(function () {
         // Event listener for modal open event
         $('#returnDataModal').on('shown.bs.modal', function () {
-            //alert();
-            // Fetch the PubDate dynamically (replace this with your logic)
-            var pubDate = $('#publicationDate').val(); // Assuming you have an input field for PubDate
+            // Fetch the PubDate dynamically
+            var pubDate = $('#publicationDate').val(); 
             var formattedPubDate = encodeURIComponent(pubDate.replace(/\//g, '-'));
-            // Get the URL for the History action method with the PubDate parameter
             var url = '@Url.Action("History", "Activity", new { id = ViewData["AccountId"] })';
             url += '?pd=' + formattedPubDate; // Append the PubDate parameter to the URL
 
             // Update the href attribute of the link with the dynamically generated URL
             $('#historyLink').attr('href', url);
-        });
 
-        //Serialize the form datas.   
-        var returnsData = $("[name=returnForm] :input").serialize();
-        console.log(returnsData);
+             //Serialize the form datas.   
+            var returnsData = $("[name=returnForm] :input").serialize();
+            //console.log(returnsData);
 
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetLastEntry", "Activity")",
-            dataType: 'json',
-            data: returnsData,
-            success: function (result) {
-                console.log(result);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetLastEntry", "Activity")",
+                dataType: 'json',
+                data: returnsData,
+                success: function (result) {
+                    console.log(result);
+                    if (!isEmptyObject(result)) {
+                        // Show last update if found
+                        $('#historyData').show();
+
+                        $('#lastUpdate').html(result["LASTUPDATED"]);
+                        $('#lastRet').html(result["RETAMT"]);
+                        $('#lastUser').html(result["USER"]);
+                    } else {
+                        // Hide update box
+                        $('#historyData').hide();
+                    }
+                    
 
 
                        
-            }
+                }
+            });
         });
+
+       
     });
 
 </script>
