@@ -15,6 +15,8 @@ namespace QRSPortal2.Controllers
             try
             {
                 ViewData["Error"] = TempData["Error"];
+                ViewData["UserRole"] = (User.IsInRole("Retailer") ? "Retailer" : (User.IsInRole("Circulation") ? "Circulation" : (User.IsInRole("Supervisor") ? "Supervisor" : "Admin")));
+
                 using (var cxt = new ApplicationDbContext())
                 {
 

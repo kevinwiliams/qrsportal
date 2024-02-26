@@ -21,17 +21,17 @@
                         <thead>
                             <tr>
 
-                                <th>
+                                <th class="text-center">
                                     @Html.DisplayNameFor(model => model.PublicationDate)
                                 </th>
-                                <th>
+                                <th class="text-center">
                                     @Html.DisplayNameFor(model => model.DistributionAmount)
                                 </th>
 
-                                <th>
+                                <th class="text-center">
                                     @Html.DisplayNameFor(model => model.ReturnAmount)
                                 </th>
-                                <th>
+                                <th class="text-center">
                                     @Html.DisplayNameFor(model => model.ConfirmedAmount)
                                 </th>
 
@@ -39,7 +39,7 @@
             @Html.DisplayNameFor(model => model.ConfirmedAmount)
         </th>*@
 
-                                <th>
+                                <th class="text-center">
                                     @Html.DisplayNameFor(model => model.Status)
                                 </th>
                                 <th></th>
@@ -50,40 +50,44 @@
                             @foreach (var item in Model)
                             {
                                 var statusClass = (item.Status == "Closed") ? "bg-danger" : "bg-success";
+                                var modal = (item.Status == "Closed") ? false : true;
                             <tr>
 
-                                <td>
+                                <td class="text-center">
+                                    @if (modal)
+                                    {
                                     <a href="#" data-bs-toggle="modal" data-bs-target="#returnDataModal">
                                         @Html.DisplayFor(modelItem => item.PublicationDate)
                                         @Html.HiddenFor(modelItem => item.PublicationDate)
+
                                     </a>
+                                    }
+                                    else
+                                    {
+                                        @Html.DisplayFor(modelItem => item.PublicationDate)
+
+                                    }
+
+
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     @Html.DisplayFor(modelItem => item.DistributionAmount)
                                 </td>
 
-                                <td>
+                                <td class="text-center">
                                     @Html.DisplayFor(modelItem => item.ReturnAmount)
                                     @Html.HiddenFor(modelItem => item.ReturnAmount)
                                     @Html.HiddenFor(modelItem => item.ConfirmedAmount)
 
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     @Html.DisplayFor(modelItem => item.ConfirmedAmount)
                                 </td>
-
-                                @*<td>
-            @Html.DisplayFor(modelItem => item.ConfirmedAmount)
-        </td>*@
-
-                                <td>
+                                <td class="text-center">
                                     <span class="badge @statusClass">@Html.DisplayFor(modelItem => item.Status)</span>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <i class="bi bi-clipboard"></i>
-                                    @*<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                Enter Return Data
-            </button>*@
                                 </td>
                             </tr>
                             }
@@ -113,23 +117,23 @@
 <script>
     var publicationDate = "";
     var userRole = $('#userRole').val();
-    console.log('userRole: ' + userRole);
+    //console.log('userRole: ' + userRole);
 
     if (userRole === "Retailer") {
-        // Show admin-specific content
-        $("[for=confirmAmount").hide();
+        $("[for=confirmAmount]").hide();
         $("#confirmAmount").hide();
     } else {
         // Show user-specific content
-        //$(".admin-content").hide();
         $("#confirmAmount").show();
         $("#confirmAmount").prop("required", true);
+        $("#returnAmount").prop("readonly", true);
     }
 
 
     function ReloadPage() {
         location.reload();
     }
+    var hideColumn = (userRole == "Retailer") ? true : false;
     $(document).ready(function () {
         $('a[data-bs-toggle="modal"]').click(function () {
             //console.log($(this).find(':first-child').val());
@@ -214,9 +218,16 @@
 
 
         $('.dtDistributions').DataTable({
-            "lengthChange": false,
-            "ordering": false,
-            pageLength: 30
+            lengthChange: false,
+            ordering: false,
+            pageLength: 30,
+            columnDefs: [
+            {
+                targets: [3],
+                visible: !hideColumn,
+                searchable: false
+            }
+        ]
 
         });
 

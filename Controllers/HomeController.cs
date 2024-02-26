@@ -14,6 +14,7 @@ namespace QRSPortal2.Controllers
         {
             if (Request.IsAuthenticated)
             {
+                ViewData["UserRole"] = (User.IsInRole("Retailer") ? "Retailer" : (User.IsInRole("Circulation") ? "Circulation" : (User.IsInRole("Supervisor") ? "Supervisor" : "Admin")));
 
                 if (User.IsInRole("Retailer") || User.IsInRole("Admin"))
                 {

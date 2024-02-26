@@ -165,6 +165,13 @@ namespace QRSPortal2.Controllers
         public ActionResult Register()
         {
             //await MigrateUsers();
+            List<SelectListItem> roles = new List<SelectListItem>();
+            var dbRoles = _db.Roles.ToList();
+            foreach (var role in dbRoles)
+                roles.Add(new SelectListItem() { Value = role.Name, Text = role.Name });
+
+            ViewBag.Roles = roles;
+
             return View();
         }
 
@@ -181,6 +188,7 @@ namespace QRSPortal2.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    result = await UserManager.AddToRoleAsync(user.Id, model.RoleName);
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
                     
                     // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771

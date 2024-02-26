@@ -101,7 +101,7 @@ namespace QRSPortal2
                 if (exc.Message != null) { errmsg.AppendLine(exc.Message.ToString()); }
 
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandText = "dbo.JOL_Epaper_LogError";
+                cmd.CommandText = "dbo.QRS_LogError";
                 cmd.Parameters.AddWithValue("err_msg", errmsg.ToString());
                 cmd.Parameters.AddWithValue("err_date", DateTime.Now.ToShortDateString());
                 cmd.Parameters.AddWithValue("err_time", DateTime.Now.ToShortTimeString());
