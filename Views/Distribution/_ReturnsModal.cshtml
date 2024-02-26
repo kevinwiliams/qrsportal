@@ -46,11 +46,11 @@
                         <input type="hidden" class="form-control" id="updatedUserName" name="updatedUserName">
                         <input type="hidden" class="form-control" id="updatedAmount" name="updatedAmount">
 
-                        @*<p class="small text-secondary">
-                                Last Updated: 2024-03-02 4:43pm<br>
-                                User: John Tom<br>
-                                Return: 9
-                            </p>*@
+                        <p class="small text-secondary" id="historyData" name="historyData">
+                                Last Updated: <span id="lastUpdate"></span><br>
+                                User: <span id="lastUser"></span><br>
+                                Return: <span id="lastRet"></span>
+                            </p>
 
                         @*<a class="small" href="@Url.Action("History", "Activity", new { id = ViewData["AccountId"], pd = ViewData["PubDate"] })">Show History</a>*@
                         <a id="historyLink" class="small" href="#">Show History</a>
@@ -99,6 +99,23 @@
 
             // Update the href attribute of the link with the dynamically generated URL
             $('#historyLink').attr('href', url);
+        });
+
+        //Serialize the form datas.   
+        var returnsData = $("[name=returnForm] :input").serialize();
+        console.log(returnsData);
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetLastEntry", "Activity")",
+            dataType: 'json',
+            data: returnsData,
+            success: function (result) {
+                console.log(result);
+
+
+                       
+            }
         });
     });
 

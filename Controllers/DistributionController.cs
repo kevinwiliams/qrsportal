@@ -213,11 +213,13 @@ namespace QRSPortal2.Controllers
             }
            
         }
+
+        
         // GET: Distribution/Create
         public ActionResult Create()
-        {
-            return View();
-        }
+    {
+        return View();
+    }
 
         // POST: Distribution/Create
         [HttpPost]

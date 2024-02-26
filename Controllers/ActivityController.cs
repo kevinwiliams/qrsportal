@@ -3,6 +3,7 @@ using QRSPortal2.ModelsDB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -32,6 +33,38 @@ namespace QRSPortal2.Controllers
             }
             return View(qRSActivityLogs);
         }
+
+
+        [HttpPost]
+        [AllowAnonymous]
+        public JsonResult GetLastEntry(FormCollection frm)
+        {
+            // Access form data using the collection parameter
+            string accountId = frm["accountId"];
+            string publicationDate = frm["publicationDate"];
+            DateTime parsedPublicationDate;
+            var response = Json(new { });
+
+            if (DateTime.TryParse(publicationDate, out parsedPublicationDate))
+            {
+
+                var result = _db.QRSActivityLog.AsNoTracking().Where(x => x.AccountID == accountId && x.PublicationDate == parsedPublicationDate).ToList();
+                if (result != null)
+                {
+                    response = Json(new
+                    {
+                        LASTUPDATED = result.FirstOrDefault().CreatedAt.ToString("yyyy-mm-dd h:mm tt"),
+                        RETAMT = result.FirstOrDefault().ReturnAmount,
+                        USER = result.FirstOrDefault().UserName
+                    });
+                }
+
+            }
+
+
+            return response;
+        }
+
 
         // GET: Activity/Create
         public ActionResult Create()
