@@ -10,6 +10,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 
 namespace QRSPortal2.Controllers
 {
@@ -52,7 +53,7 @@ namespace QRSPortal2.Controllers
             }
         }
 
-        // GET: Distribution/Details/5
+        // GET: Distribution/Account/00021521
         public async Task<ActionResult> Account(string id)
         {
             try
@@ -141,7 +142,10 @@ namespace QRSPortal2.Controllers
                 string returnAmount = frm["returnAmount"];
                 string confirmAmount = frm["confirmAmount"];
                 string publicationDate = frm["publicationDate"];
+                string loggedEmail = frm["loggedEmail"];
                 string userRole = frm["userRole"];
+                int returnCount = 0;
+                string retStatus = "Open";
                 DateTime parsedPublicationDate;
 
                 if (DateTime.TryParse(publicationDate, out parsedPublicationDate))
@@ -153,19 +157,41 @@ namespace QRSPortal2.Controllers
                         {
                             cxt.Entry(pubEntry).State = System.Data.Entity.EntityState.Modified;
 
-                            pubEntry.ReturnAmount = Convert.ToInt32(returnAmount);
+                            returnCount = Convert.ToInt32(returnAmount);
+
+                            pubEntry.ReturnAmount = returnCount;
+                            pubEntry.Status = retStatus;
                             pubEntry.ReturnDate = DateTime.Now;
                             pubEntry.UpdatedAt = DateTime.Now;
 
                             if (userRole != "Retailer")
                             {
-                                pubEntry.ConfirmedAmount = Convert.ToInt32(confirmAmount);
+                                returnCount = Convert.ToInt32(confirmAmount);
+
+                                retStatus = "Closed";
+
+                                pubEntry.ConfirmedAmount = returnCount;
                                 pubEntry.ConfirmDate = DateTime.Now;
                                 pubEntry.UpdatedAt = DateTime.Now;
-                                pubEntry.Status = "Closed";
+                                pubEntry.Status = retStatus;
                                 pubEntry.ConfirmReturn = true;
                             }
                             await cxt.SaveChangesAsync();
+
+                            // Update Activity Logs
+
+                            QRSActivityLog qRSActivityLog = new QRSActivityLog 
+                            {
+                                AccountID = accountId,
+                                LogInformation = "",
+                                UserName = cxt.Users.FirstOrDefault(x => x.Email == loggedEmail).FullName,
+                                EmailAddress = loggedEmail,
+                                PublicationDate = parsedPublicationDate,
+                                ReturnAmount = returnCount,
+                                Status = retStatus
+                            };
+
+                            Util.LogUserActivity(qRSActivityLog);
 
                             return Json(new { success = true });
 

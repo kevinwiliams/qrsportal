@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using QRSPortal2.ModelsDB;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using System.ComponentModel.DataAnnotations;
 
 namespace QRSPortal2.Models
 {
@@ -11,6 +12,9 @@ namespace QRSPortal2.Models
     public class ApplicationUser : IdentityUser
     {
         public CircproUsers CircproUser { get; set; }
+        [Display(Name = "Full Name")]
+        [StringLength(250)]
+        public string FullName { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {

@@ -19,6 +19,8 @@ using Newtonsoft.Json;
 using QRSPortal2.Models;
 using System.Web.Script.Serialization;
 using System.Globalization;
+using DeviceDetectorNET;
+using QRSPortal2.ModelsDB;
 
 namespace QRSPortal2
 {
@@ -73,7 +75,7 @@ namespace QRSPortal2
                 sb.Append(string.Format("Error occurred at {1} on {2}: {0} in the method {3} at location {4}", ex.Message, time, today, ex.TargetSite.Name, ex.StackTrace));
                 Task.Run(async () =>
                 {
-                    await FileHelper(location, $"epaper_app_log_{dateStamp}.txt", encoding.GetBytes(sb.ToString()));
+                    await FileHelper(location, $"qrs_app_log_{dateStamp}.txt", encoding.GetBytes(sb.ToString()));
                 });
             }
 
@@ -394,7 +396,29 @@ namespace QRSPortal2
             return browser;
         }
 
-      
+        public static string GetOSName(string userAgent)
+        {
+
+            DeviceDetectorSettings.RegexesDirectory = HostingEnvironment.MapPath("~/bin/");
+
+            try
+            {
+                var dd = new DeviceDetector(userAgent);
+
+                dd.Parse();
+                var clientInfo = dd.GetClient();
+                var os = dd.GetOs();
+
+                return $"{os?.Match?.Name} {os?.Match?.Version}";
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            
+        }
+
         public static string GetIPAddress()
         {
             var req = HttpContext.Current.Request;
@@ -793,7 +817,45 @@ namespace QRSPortal2
             return null;
         }
 
-        
+        public static bool LogUserActivity(QRSActivityLog actLog)
+        {
+            SqlCommand cmd = new SqlCommand();
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["DBEntities"].ConnectionString);
+            bool result = false;
+
+            try
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "dbo.QRS_Activity_Log";
+                cmd.Parameters.AddWithValue("AccountID", actLog.AccountID);
+                cmd.Parameters.AddWithValue("UserName", actLog.UserName);
+                cmd.Parameters.AddWithValue("EmailAddress", actLog.EmailAddress);
+                cmd.Parameters.AddWithValue("PublicationDate", actLog.PublicationDate);
+                cmd.Parameters.AddWithValue("ReturnAmount", actLog.ReturnAmount);
+                cmd.Parameters.AddWithValue("Status", actLog.Status);
+                cmd.Parameters.AddWithValue("IPAddress", GetIPAddress());
+                cmd.Parameters.AddWithValue("LogInformation", actLog.LogInformation);
+                cmd.Parameters.AddWithValue("SystemInformation", Util.GetBrowserName() + " / " + Util.GetOSName(HttpContext.Current.Request.UserAgent));
+                cmd.Parameters.AddWithValue("CreatedAt", DateTime.Now);
+
+                cmd.Connection = con;
+                con.Open();
+
+                cmd.ExecuteNonQuery();
+
+                con.Close();
+                result = true;
+
+            }
+            catch (Exception ex)
+            {
+                result = false;
+                Util.LogErrror(ex);
+            }
+
+            return result;
+        }
+
     }
 
     
