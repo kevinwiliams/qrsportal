@@ -28,11 +28,13 @@ namespace QRSPortal2
                      //"~/Content/chart.js/chart.umd.js",
                       "~/Scripts/sweetalert.min.js",
                      "~/Content/simple-datatables/simple-datatables.js",
+                     "~/Content/apexcharts/apexcharts.min.js",
                      "~/Scripts/main.js"));
 
             bundles.Add(new StyleBundle("~/Content/vendor").Include(
                     "~/Content/bootstrap-icons/bootstrap-icons.css",
                     "~/Content/boxicons/css/boxicons.min.css",
+                    "~/Content/apexcharts/apexcharts.css",
                     "~/Content/simple-datatables/style.css"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(

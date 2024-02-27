@@ -1,10 +1,9 @@
-﻿@{
+﻿@model QRSPortal2.Models.TransactionDataViewModel
+@{
     ViewBag.Title = "Welcome";
 }
 
-<div class="jumbotron">
-   
-</div>
+
 
 <div class="row">
     <div class="col-md-12">
@@ -22,6 +21,146 @@
         }
 
 
-
     </div>
 </div>
+
+<section class="section">
+    <div class="row">
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Weekly Returns</h5>
+                    <!-- Line Chart -->
+                    <div id="weeklyChart"></div>
+
+                    <script>
+                        @{
+                            var periodText = Model.WeeklyData.Select(x => "'" + x.PeriodText + "'");
+                            var joinPeriodText = "[" + string.Join(",", periodText) + "]";
+                        }
+                        document.addEventListener("DOMContentLoaded", () => {
+                            var weeklyChartOptions = {
+                                series: [{
+                                            name: 'Total Distributed Amount',
+                                            data: [@String.Join(",", Model.WeeklyData.Select(item => item.TotalDistributionAmount))]
+                                        },
+                                        {
+                                            name: 'Total Return Amount',
+                                            data: [@String.Join(",", Model.WeeklyData.Select(item => item.TotalReturnAmount))]
+                                        },
+                                        {
+                                            name: 'Total Confirmed Amount',
+                                            data: [@String.Join(",", Model.WeeklyData.Select(item => item.TotalConfirmedAmount))]
+                                          }],
+                                chart: {
+                                    height: 350,
+                                    type: 'line',
+                                    zoom: {
+                                        enabled: false
+                                    }
+                                },
+                                dataLabels: {
+                                    enabled: false
+                                },
+                                stroke: {
+                                    curve: 'straight'
+                                },
+                                grid: {
+                                    row: {
+                                        colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                                        opacity: 0.5
+                                    },
+                                },
+                                xaxis: {
+                                    categories: @Html.Raw(joinPeriodText),
+                                    title: {
+                                            text: 'Week'
+                                          }
+                                },
+                                 yaxis: {
+                                      title: {
+                                        text: 'Distributions'
+                                          }
+                                    },
+                            };
+
+                            var weeklyChart = new ApexCharts(document.querySelector("#weeklyChart"), weeklyChartOptions);
+                            weeklyChart.render();
+                        });
+                    </script>
+                    <!-- End Line Chart -->
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Monthly Returns</h5>
+                    <!-- Line Chart -->
+                    <div id="monthlyChart"></div>
+
+                    <script>
+                         @{
+                            var periodTextM = Model.MonthlyData.Select(x => "'" + x.PeriodText + "'");
+                            var joinPeriodTextM = "[" + string.Join(",", periodTextM) + "]";
+                        }
+                        document.addEventListener("DOMContentLoaded", () => {
+                            var monthlyChartOptions = {
+                                series: [{
+                                            name: 'Total Distributed Amount',
+                                            data: [@String.Join(",", Model.MonthlyData.Select(item => item.TotalDistributionAmount))]
+                                        },
+                                        {
+                                            name: 'Total Return Amount',
+                                            data: [@String.Join(",", Model.MonthlyData.Select(item => item.TotalReturnAmount))]
+                                        },
+                                        {
+                                            name: 'Total Confirmed Amount',
+                                            data: [@String.Join(",", Model.MonthlyData.Select(item => item.TotalConfirmedAmount))]
+                                          }],
+                                chart: {
+                                    height: 350,
+                                    type: 'line',
+                                    zoom: {
+                                        enabled: false
+                                    }
+                                },
+                                dataLabels: {
+                                    enabled: false
+                                },
+                                stroke: {
+                                    curve: 'straight'
+                                },
+                                grid: {
+                                    row: {
+                                        colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                                        opacity: 0.5
+                                    },
+                                },
+                                xaxis: {
+                                    categories: @Html.Raw(joinPeriodTextM),
+                                    title: {
+                                            text: 'Month'
+                                          }
+                                },
+                                 yaxis: {
+                                      title: {
+                                        text: 'Distributions'
+                                          }
+                                    },
+                            };
+
+                            var monthlyChart = new ApexCharts(document.querySelector("#monthlyChart"), monthlyChartOptions);
+                            monthlyChart.render();
+                        });
+                    </script>
+                    <!-- End Line Chart -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

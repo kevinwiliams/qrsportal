@@ -15,8 +15,30 @@ namespace QRSPortal2.Controllers
             if (Request.IsAuthenticated)
             {
                 ViewData["UserRole"] = (User.IsInRole("Retailer") ? "Retailer" : (User.IsInRole("Circulation") ? "Circulation" : (User.IsInRole("Supervisor") ? "Supervisor" : "Admin")));
+                
+                if (User.IsInRole("Circulation") || User.IsInRole("Admin")) {
+                    try
+                    {
+                        List<TransactionData> weeklyData = GetWeeklyTransactionData();
+                        List<TransactionData> monthlyData = GetMonthlyTransactionData();
 
-                if (User.IsInRole("Retailer") || User.IsInRole("Admin"))
+                        TransactionDataViewModel viewModel = new TransactionDataViewModel
+                        {
+                            WeeklyData = weeklyData,
+                            MonthlyData = monthlyData
+                        };
+                        return View(viewModel);
+
+                    }
+                    catch (Exception ex)
+                    {
+
+                        throw ex;
+                    }
+                }
+                   
+
+                if (User.IsInRole("Supervisor") )
                 {
                     try
                     {
@@ -41,6 +63,83 @@ namespace QRSPortal2.Controllers
             }
 
             return View();
+        }
+
+        private List<TransactionData> GetMonthlyTransactionData()
+        {
+            List<TransactionData> list = new List<TransactionData>();
+            try
+            {
+                using (ApplicationDbContext db = new ApplicationDbContext())
+                {
+                    using (var cxt = new ApplicationDbContext())
+                    {
+
+                        var sql = @"SELECT MONTH(PublicationDate) AS PeriodNumber,
+                                           SUM(DistributionAmount) AS TotalDistributionAmount,
+                                           SUM(ReturnAmount) AS TotalReturnAmount,
+                                           SUM(ConfirmedAmount) AS TotalConfirmedAmount
+                                    FROM [dbo].[CircProTransactions]
+                                    GROUP BY MONTH(PublicationDate)
+                                    ORDER BY PeriodNumber";
+
+                        var result = cxt.Database.SqlQuery<TransactionData>(sql).ToList();
+                        //TODO:Loop to trim address field
+                        foreach (var item in result)
+                        {
+                            item.PeriodText = "Month " + item.PeriodNumber;
+                        }
+
+                        return result;
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Util.LogError(ex);
+                return list;
+            }
+        }
+
+        private List<TransactionData> GetWeeklyTransactionData()
+        {
+            List<TransactionData> list = new List<TransactionData>();
+            try
+            {
+                using (ApplicationDbContext db = new ApplicationDbContext())
+                {
+                    using (var cxt = new ApplicationDbContext())
+                    {
+
+                        var sql = @"SELECT DATEPART(week, PublicationDate) AS PeriodNumber,
+                                            SUM(DistributionAmount) AS TotalDistributionAmount,
+                                            SUM(ReturnAmount) AS TotalReturnAmount,
+                                            SUM(ConfirmedAmount) AS TotalConfirmedAmount
+                                    FROM [dbo].[CircProTransactions]
+                                    GROUP BY DATEPART(week, PublicationDate)
+                                    ORDER BY PeriodNumber";
+
+                        var result = cxt.Database.SqlQuery<TransactionData>(sql).ToList();
+
+                        foreach (var item in result)
+                        {
+                            item.PeriodText = "Week " + item.PeriodNumber;
+                        }
+                        //TODO:Loop to trim address field
+
+                        return result;
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Util.LogError(ex);
+                return list;
+            }
         }
 
         public ActionResult About()

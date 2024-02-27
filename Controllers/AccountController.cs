@@ -521,6 +521,8 @@ namespace QRSPortal2.Controllers
                             string UserID = "";
                             int addressID = 0;
                             var emailAddress = item.EMAIL;
+                            var FullName = (item.FIRST_NAME == "null" ? null : item.FIRST_NAME) + " " + (item.LAST_NAME == "null" ? null : item.LAST_NAME);
+                            FullName = (FullName != null) ? FullName : (item.COMPANY == "null" ? null : item.COMPANY);
 
                             CircproUsers circProUsers = new CircproUsers
                             {
@@ -551,6 +553,7 @@ namespace QRSPortal2.Controllers
                             var newAccount = new ApplicationUser 
                             { 
                                 UserName = emailAddress,
+                                FullName = FullName,
                                 Email = emailAddress,
                                 CircproUser = circProUsers
                             };
