@@ -624,7 +624,7 @@ namespace QRSPortal2.Controllers
             catch (Exception ex)
             {
 
-                //throw ex;
+                LogError(ex);
                 return false;
             }
         }

@@ -38,7 +38,7 @@ namespace QRSPortal2.Controllers
                 }
                    
 
-                if (User.IsInRole("Supervisor") )
+                if (User.IsInRole("Supervisor") || User.IsInRole("Retailer"))
                 {
                     try
                     {

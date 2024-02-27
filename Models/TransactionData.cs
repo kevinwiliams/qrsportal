@@ -18,5 +18,6 @@ namespace QRSPortal2.Models
     {
         public List<TransactionData> WeeklyData { get; set; }
         public List<TransactionData> MonthlyData { get; set; }
+        public List<TransactionData> DailyData { get; set; }
     }
 }

@@ -17,7 +17,7 @@ namespace QRSPortal2.Controllers
     public class DistributionController : Controller
     {
         // GET: Distribution
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
         {
             try
             {
