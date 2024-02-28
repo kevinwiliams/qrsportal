@@ -88,9 +88,9 @@ namespace QRSPortal2.Controllers
                                     U.EmailAddress,
                                     U.Company,
                                     NULLIF(
-                                        COALESCE(TRIM(A.AddressLine1) + ', ', '') + 
-                                        COALESCE(TRIM(A.AddressLine2) + ', ', '') + 
-                                        COALESCE(TRIM(A.CityTown), ''), 
+                                        COALESCE(LTRIM(RTRIM(A.AddressLine1)) + ', ', '') + 
+                                        COALESCE(LTRIM(RTRIM(A.AddressLine2)) + ', ', '') + 
+                                        COALESCE(LTRIM(RTRIM(A.CityTown)), ''), 
                                         ''
                                     ) AS RetailerAddress,
                                     U.PhoneNumber,
