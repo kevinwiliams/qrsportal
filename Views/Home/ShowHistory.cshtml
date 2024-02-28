@@ -1,0 +1,66 @@
+﻿
+@{
+    ViewBag.Title = "Show History";
+}
+
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Publication Date: 2024-02-03</h5>
+
+                    <a href="#" onclick="history.back();" class="btn btn-secondary"><i class="bi bi-box-arrow-in-left"></i> Back</a>
+
+
+                    <table class="table table-sm small dtHistory">
+                        <thead>
+                            <tr>
+                                <th>Account ID</th>
+                                <th>IP</th>
+                                <th>User</th>
+                                <th>PubDate</th>
+                                <th>Ret</th>
+                                <th>Status</th>
+                                <th>Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>0007473</td>
+                                <td>102.203.025.005</td>
+                                <td>LENNOX WILSON</td>
+                                <td>2024-Feb-02</td>
+                                <td>8</td>
+                                <td>Open</td>
+                                <td>2024-02-03 4:42pm</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="action" value="@ViewBag.ShowConfirm" />
+</section>
+
+
+@Scripts.Render("~/bundles/jquery")
+
+<script>
+    $(document).ready(function () {
+
+        $('.dtHistory').DataTable({
+            //order: [[1, 'desc']],
+            "lengthChange": false,
+            //"bFilter": false,
+            pageLength: 30
+
+        });
+
+    });
+</script>
+

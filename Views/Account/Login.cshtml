@@ -1,0 +1,91 @@
+﻿@using QRSPortal2.Models
+@model LoginViewModel
+@{
+    ViewBag.Title = "Log in";
+}
+
+<section class="section register d-flex flex-column align-items-center justify-content-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
+
+                <div class="d-flex justify-content-center py-4">
+                    <a href="@Url.Action("index", "home")" class="logo d-flex align-items-center w-auto">
+                        <img src="@Url.Content("~/assets/img/logo.png")" alt="">
+                        <span class="d-none d-lg-block">QRS Portal</span>
+                    </a>
+                </div><!-- End Logo -->
+
+                <div class="card mb-3">
+
+                    <div class="card-body">
+
+                        <div class="pt-1 pb-2">
+                            <h5 class="card-title text-center pb-0 fs-4">Login to Your Account</h5>
+                            <p class="text-center small">Enter your email & password to login</p>
+                        </div>
+
+                        @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "row g-3 needs-validation", role = "form", novalidate = "novalidate" }))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            <div class="col-12">
+
+
+                                <div class="form-floating">
+                                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Your Email", required = "required" })
+                                    @Html.LabelFor(m => m.Email, new { @class = "", })
+                                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "invalid-feedback" })
+
+
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Your Password", required = "required" })
+                                    @Html.LabelFor(m => m.Password, new { @class = "", })
+                                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "invalid-feedback" })
+
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check">
+                                    @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input", })
+                                    @Html.LabelFor(m => m.RememberMe, new { @class = "form-check-label", })
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100" type="submit">Login</button>
+                            </div>
+                            @*<div class="col-12">
+                                <p class="small mb-0">Don't have account? @Html.ActionLink("Create an account", "Register")</p>
+                            </div>*@
+                            <div class="col-12">
+                                <p class="small mb-0">@Html.ActionLink("Forgot your password?", "ForgotPassword", new { @class = "small" })</p>
+                            </div>
+
+                        }
+                        <hr>
+                        <div class="col-12">
+                            <section id="socialLoginForm">
+                                @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl })
+                            </section>
+                        </div>
+
+                    </div>
+                </div>
+
+               
+
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

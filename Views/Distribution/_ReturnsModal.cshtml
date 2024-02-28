@@ -1,0 +1,137 @@
+﻿
+@Html.AntiForgeryToken()
+
+
+<div class="modal fade" id="returnDataModal" name="returnDataModal" tabindex="-1" role="dialog" aria-labelledby="returnDataModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="returnDataModalLabel">Return: <span id="pubDateModal"></span></h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="returnForm" name="returnForm" role="form" method="POST" class="g-3 needs-validation" data-request-url="@Url.Action("updatereturns","distribution")">
+                    <div class="form-group m-2">
+                        @*<label for="publicationDate">Publication Date: <span id="pubDateModal"></span></label>*@
+                        <input type="hidden" class="form-control" id="publicationDate" name="publicationDate">
+                        <input type="hidden" class="form-control" id="accountId" name="accountId" value="@ViewData["AccountId"]">
+                        <input type="hidden" class="form-control" id="userRole" name="userRole" value="@ViewData["UserRole"]">
+                        <input type="hidden" class="form-control" id="loggedEmail" name="loggedEmail" value="@User.Identity.Name">
+
+                    </div>
+                    <div class="form-group m-2">
+                        <label for="returnAmount">Return Amount</label>
+                        <input type="number" class="form-control" id="returnAmount" name="returnAmount" required>
+                    </div>
+
+                    <div class="form-group m-2">
+                        <label for="confirmAmount">Confirm Amount</label>
+                        <input type="number" class="form-control" id="confirmAmount" name="confirmAmount">
+                    </div>
+
+                    <div class="form-check m-2">
+                        <input class="form-check-input" type="checkbox" id="confirmReturn" name="confirmReturn" required>
+                        <label class="form-check-label small" for="confirmReturn">
+                            Confirm Return Amount
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary m-2 mb-0">Update</button>
+                </form>
+                <div class="row mt-4">
+                    <div class="col-12 align-content-center">
+                        <input type="hidden" class="form-control" id="lastUpdated" name="lastUpdated">
+                        <input type="hidden" class="form-control" id="updatedUserName" name="updatedUserName">
+                        <input type="hidden" class="form-control" id="updatedAmount" name="updatedAmount">
+
+                        <p class="small text-secondary" id="historyData" name="historyData">
+                                Updated: <span id="lastUpdate"></span><br>
+                                User: <span id="lastUser"></span><br>
+                                Return: <span id="lastRet"></span>
+                            </p>
+
+                        @*<a class="small" href="@Url.Action("History", "Activity", new { id = ViewData["AccountId"], pd = ViewData["PubDate"] })">Show History</a>*@
+                        <a id="historyLink" class="small" href="#">Show History</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/jqueryval")
+
+<script>
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (() => {
+        'use strict'
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })();
+    </script>
+<script>
+    function isEmptyObject(obj) {
+        return Object.keys(obj).length === 0;
+    }
+
+    $(function () {
+        // Event listener for modal open event
+        $('#returnDataModal').on('shown.bs.modal', function () {
+            // Fetch the PubDate dynamically
+            var pubDate = $('#publicationDate').val(); 
+            var formattedPubDate = encodeURIComponent(pubDate.replace(/\//g, '-'));
+            var url = '@Url.Action("history", "activity", new { id = ViewData["AccountId"] })';
+            url += '?pd=' + formattedPubDate; // Append the PubDate parameter to the URL
+
+            // Update the href attribute of the link with the dynamically generated URL
+            $('#historyLink').attr('href', url);
+
+             //Serialize the form datas.   
+            var returnsData = $("[name=returnForm] :input").serialize();
+            //console.log(returnsData);
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetLastEntry", "Activity")",
+                dataType: 'json',
+                data: returnsData,
+                success: function (result) {
+                    //console.log(result);
+                    if (!isEmptyObject(result)) {
+                        // Show last update if found
+                        $('#historyData').show();
+
+                        $('#lastUpdate').html(result["LASTUPDATED"]);
+                        $('#lastRet').html(result["RETAMT"]);
+                        $('#lastUser').html(result["USER"]);
+                    } else {
+                        // Hide update box
+                        $('#historyData').hide();
+                    }
+                    
+
+
+                       
+                }
+            });
+        });
+
+       
+    });
+
+</script>

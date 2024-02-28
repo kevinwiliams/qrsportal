@@ -1,0 +1,118 @@
+﻿@model IEnumerable<QRSPortal2.Models.Retailer>
+
+@{
+    ViewBag.Title = "All Agents";
+}
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Agent List</h5>
+
+                    <table class="table table-hover table-striped small dtRetailers">
+                        <thead>
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.AccountID)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.DistributionID)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.RetailerName)
+                                </th>
+                                @*<th>
+                                    @Html.DisplayNameFor(model => model.EmailAddress)
+                                </th>*@
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Company)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.RetailerAddress)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.PhoneNumber)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.CellNumber)
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <a href="@Url.Action("account", "distribution", new { id = item.AccountID })"> @Html.DisplayFor(modelItem => item.AccountID)</a>
+</td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DistributionID)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.RetailerName)
+                                    </td>
+                                    @*<td>
+                                        @Html.DisplayFor(modelItem => item.EmailAddress)
+                                    </td>*@
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Company)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.RetailerAddress)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.PhoneNumber)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.CellNumber)
+                                    </td>
+                                    <td>
+                                        <a href="@Url.Action("account", "distribution", new { id = item.AccountID })"><i class="bi bi-box-arrow-up-right"></i></a>
+
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <!-- End Default Table Example -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<input type="hidden" name="error" id="error" value="@TempData["Error"]" />
+@Scripts.Render("~/bundles/jquery")
+
+<script>
+    $(document).ready(function () {
+        var showError = $('#error').val();
+            if (showError) {
+                swal({
+                title: "Error!",
+                text: "No records found for the account",
+                type: "warning",
+                dangerMode: true
+            });
+        }
+
+        console.log($('[name=error]').val())
+        $('.dtRetailers').DataTable({
+           order: [[0, 'desc']],
+            pageLength: 15,
+            "lengthChange": false,
+            responsive: true,
+            columnDefs: [
+                { responsivePriority: 1, targets: 0 }, // Account
+                { responsivePriority: 2, targets: 2 }, // Name
+                { responsivePriority: 3, targets: 3 }, // Company
+                //{ responsivePriority: 3, targets: 8 }  // Action
+            ]
+
+        });
+
+    });
+</script>
