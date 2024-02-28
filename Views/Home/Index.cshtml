@@ -122,6 +122,7 @@
                 data: transactionData.map(function (item) { return item.TotalConfirmedAmount; })
             }],
             chart: {
+                id: 'returnsChart',
                 height: 350,
                 type: 'line',
                 zoom: {
@@ -154,9 +155,10 @@
         };
 
         var returnsChart = new ApexCharts(document.querySelector("#returnsChart"), chartOptions);
+        returnsChart.render();
 
         // Clear chart data by setting an empty array for series data
-        /*returnsChart.updateSeries([{
+        ApexCharts.exec('returnsChart', 'updateSeries',[{
             name: 'Distributed',
             data: []
         }, {
@@ -165,10 +167,10 @@
         }, {
             name: 'Confirmed',
             data: []
-        }]);*/
+        }], true);
 
         // Render the chart with new data
-        /*returnsChart.updateOptions({
+        ApexCharts.exec('returnsChart', 'updateOptions',{
             xaxis: {
                 categories: transactionData.map(function (item) { return  item.PeriodText }),
             },
@@ -182,8 +184,9 @@
                 name: 'Total Confirmed Amount',
                 data: transactionData.map(function (item) { return item.TotalConfirmedAmount; })
             }]
-        });*/
-        returnsChart.render();
+        }, false, true);
+
+        
     }
 
     function loadReturnsChart(filterValue) {
