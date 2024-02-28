@@ -46,7 +46,7 @@
                             {
                                 <tr>
                                     <td>
-                                        <a href="@Url.Action("Account", "Distribution", new { id = item.AccountID })"> @Html.DisplayFor(modelItem => item.AccountID)</a>
+                                        <a href="@Url.Action("account", "distribution", new { id = item.AccountID })"> @Html.DisplayFor(modelItem => item.AccountID)</a>
 </td>
                                     <td>
                                         @Html.DisplayFor(modelItem => item.DistributionID)
@@ -70,7 +70,7 @@
                                         @Html.DisplayFor(modelItem => item.CellNumber)
                                     </td>
                                     <td>
-                                        <a href="@Url.Action("Account", "Distribution", new { id = item.AccountID })"><i class="bi bi-box-arrow-up-right"></i></a>
+                                        <a href="@Url.Action("account", "distribution", new { id = item.AccountID })"><i class="bi bi-box-arrow-up-right"></i></a>
 
                                     </td>
                                 </tr>

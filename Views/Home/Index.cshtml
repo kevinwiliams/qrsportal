@@ -80,7 +80,7 @@
                                 <div class="activite-label">@item.LogInformation</div>
                                 <i class='bi bi-circle-fill activity-badge @indicator align-self-start'></i>
                                 <div class="activity-content">
-                                    @item.UserName (<a href="#" class="fw-bold text-dark">@item.AccountID</a>) @actionTaken @item.ReturnAmount for @item.PublicationDate.ToString("MMM-dd")
+                                    @item.UserName (<a href="@Url.Action("account", "distribution", new { id = item.AccountID })" class="fw-bold text-dark">@item.AccountID</a>) @actionTaken @item.ReturnAmount for @item.PublicationDate.ToString("MMM-dd")
                                 </div>
                             </div><!-- End activity item-->
                         }
@@ -175,13 +175,13 @@
                 categories: transactionData.map(function (item) { return  item.PeriodText }),
             },
             series: [{
-                name: 'Total Distributed Amount',
+                name: 'Distributed',
                 data: transactionData.map(function (item) { return item.TotalDistributionAmount; })
             }, {
-                name: 'Total Return Amount',
+                name: 'Return',
                 data: transactionData.map(function (item) { return item.TotalReturnAmount; })
             }, {
-                name: 'Total Confirmed Amount',
+                name: 'Confirmed',
                 data: transactionData.map(function (item) { return item.TotalConfirmedAmount; })
             }]
         }, false, true);
@@ -196,7 +196,6 @@
                 type: 'POST',
                 data: { aggregationType: filterValue },
                 success: function (response) {
-                    console.log('response' + response.success);
                     if (response.success) {
                         renderChart(response.data, filterValue);
                         var interval = '| ' + toSentenceCase(filterValue);
@@ -219,7 +218,6 @@
 
             // Get the value of the data-value attribute
             var filterValue = $(this).data('value') || retChartdefault;
-            console.log(filterValue);
             loadReturnsChart(filterValue);
             
         });

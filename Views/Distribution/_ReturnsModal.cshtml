@@ -13,7 +13,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="returnForm" name="returnForm" role="form" method="POST" class="g-3 needs-validation" data-request-url="@Url.Action("UpdateReturns","distribution")">
+                <form id="returnForm" name="returnForm" role="form" method="POST" class="g-3 needs-validation" data-request-url="@Url.Action("updatereturns","distribution")">
                     <div class="form-group m-2">
                         @*<label for="publicationDate">Publication Date: <span id="pubDateModal"></span></label>*@
                         <input type="hidden" class="form-control" id="publicationDate" name="publicationDate">
@@ -95,7 +95,7 @@
             // Fetch the PubDate dynamically
             var pubDate = $('#publicationDate').val(); 
             var formattedPubDate = encodeURIComponent(pubDate.replace(/\//g, '-'));
-            var url = '@Url.Action("History", "Activity", new { id = ViewData["AccountId"] })';
+            var url = '@Url.Action("history", "activity", new { id = ViewData["AccountId"] })';
             url += '?pd=' + formattedPubDate; // Append the PubDate parameter to the URL
 
             // Update the href attribute of the link with the dynamically generated URL
@@ -111,7 +111,7 @@
                 dataType: 'json',
                 data: returnsData,
                 success: function (result) {
-                    console.log(result);
+                    //console.log(result);
                     if (!isEmptyObject(result)) {
                         // Show last update if found
                         $('#historyData').show();

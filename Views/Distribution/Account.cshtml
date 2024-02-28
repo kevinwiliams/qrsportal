@@ -82,7 +82,7 @@
                                     <span class="badge @statusClass">@Html.DisplayFor(modelItem => item.Status)</span>
                                 </td>
                                 <td class="text-center">
-                                    <a href="@Url.Action("History", "Activity", new { id = item.AccountID, pd = item.PublicationDate.ToString("yyyy-MM-dd") })">
+                                    <a href="@Url.Action("history", "activity", new { id = item.AccountID, pd = item.PublicationDate.ToString("yyyy-MM-dd") })">
                                         <i class="bi bi-clipboard"></i>
                                     </a>
                                 </td>
@@ -157,7 +157,7 @@
 
             // Create a new Date object with the extracted year, month, and day
             var date = new Date(year, month, day);
-            console.log(publicationDate);
+            //console.log(publicationDate);
             // Define days and months arrays
             var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
             var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -182,7 +182,7 @@
             if (formData) {
                 //Serialize the form datas.   
                 var returnsData = $("[name=returnForm] :input").serialize();
-                console.log(returnsData);
+                //console.log(returnsData);
 
                 $.ajax({
                     type: "POST",
