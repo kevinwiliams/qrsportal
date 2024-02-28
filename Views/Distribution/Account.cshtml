@@ -46,50 +46,55 @@
                             {
                                 var statusClass = (item.Status == "Closed") ? "bg-danger" : "bg-success";
                                 var modal = (item.Status == "Closed") ? false : true;
-                            <tr>
+                                <tr>
 
-                                <td class="text-center">
-                                    @if (modal)
-                                    {
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#returnDataModal">
-                                        @Html.DisplayFor(modelItem => item.PublicationDate)
-                                        @Html.HiddenFor(modelItem => item.PublicationDate)
+                                    <td class="text-center">
+                                        @if (modal)
+                                        {
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#returnDataModal">
+                                                @Html.DisplayFor(modelItem => item.PublicationDate)
+                                                @Html.HiddenFor(modelItem => item.PublicationDate)
 
-                                    </a>
-                                    }
-                                    else
-                                    {
-                                        @Html.DisplayFor(modelItem => item.PublicationDate)
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            @Html.DisplayFor(modelItem => item.PublicationDate)
 
-                                    }
+                                        }
+                                        @Html.HiddenFor(modelItem => item.ReturnAmount)
+                                        @Html.HiddenFor(modelItem => item.ConfirmedAmount)
+
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayFor(modelItem => item.DistributionAmount)
+                                    </td>
+
+                                    <td class="text-center">
+                                        @Html.DisplayFor(modelItem => item.ReturnAmount)
 
 
-                                </td>
-                                <td class="text-center">
-                                    @Html.DisplayFor(modelItem => item.DistributionAmount)
-                                </td>
-
-                                <td class="text-center">
-                                    @Html.DisplayFor(modelItem => item.ReturnAmount)
-                                    @Html.HiddenFor(modelItem => item.ReturnAmount)
-                                    @Html.HiddenFor(modelItem => item.ConfirmedAmount)
-
-                                </td>
-                                <td class="text-center">
-                                    @Html.DisplayFor(modelItem => item.ConfirmedAmount)
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge @statusClass">@Html.DisplayFor(modelItem => item.Status)</span>
-                                </td>
-                                <td class="text-center">
-                                    <a href="@Url.Action("history", "activity", new { id = item.AccountID, pd = item.PublicationDate.ToString("yyyy-MM-dd") })">
-                                        <i class="bi bi-clipboard"></i>
-                                    </a>
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayFor(modelItem => item.ConfirmedAmount)
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge @statusClass">@Html.DisplayFor(modelItem => item.Status)</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="@Url.Action("history", "activity", new { id = item.AccountID, pd = item.PublicationDate.ToString("yyyy-MM-dd") })">
+                                            <i class="bi bi-clipboard"></i>
+                                        </a>
+                                    </td>
+                                </tr>
                             }
                         </tbody>
-
+                        <tfoot>
+                            <tr>
+                                <th colspan="4" style="text-align:right">Avg Returns:</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
 
                     </table>
                 </div>
@@ -221,12 +226,33 @@
             ordering: false,
             pageLength: 30,
             columnDefs: [
-            {
-                targets: [3],
-                visible: !hideColumn,
-                searchable: false
-            }
-        ]
+                {
+                    targets: [3],
+                    visible: !hideColumn,
+                    //searchable: false
+                }
+            ],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api(), data;
+                // Remove the formatting to get integer data for summation
+                let intVal = function (i) {
+                    return typeof i === 'string'
+                        ? i.replace(/[\$,]/g, '') * 1
+                        : typeof i === 'number'
+                        ? i
+                        : 0;
+                };
+
+                // Calculate the average for the specific column (index 3 in this example)
+                var avg = api.column(2, { page: 'current' }).data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0 ) / api.column(2, { page: 'current' }).data().length;
+                // Update the footer
+                api.column(2).footer().innerHTML =
+                    'Avg. Returns: ' + avg.toFixed(2);
+                
+            },
 
         });
 

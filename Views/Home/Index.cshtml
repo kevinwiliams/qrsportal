@@ -11,16 +11,6 @@
 
         <p>Maximize your returns and streamline your inventory management with our cutting-edge system.</p>
 
-        <p>Our platform empowers you to effortlessly submit returns for unsold items.</p>
-        @{
-            if (!Request.IsAuthenticated)
-            {
-                <p>Ready to take control of your inventory? @Html.ActionLink("Log In", "Login", "Account") now to access your account and start maximizing your returns.</p>
-
-            }
-        }
-
-
     </div>
 </div>
 
@@ -185,8 +175,6 @@
                 data: transactionData.map(function (item) { return item.TotalConfirmedAmount; })
             }]
         }, false, true);
-
-        
     }
 
     function loadReturnsChart(filterValue) {

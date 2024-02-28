@@ -320,6 +320,7 @@
     <Content Include="Content\apexcharts\locales\ua.json" />
     <Content Include="Content\apexcharts\locales\zh-cn.json" />
     <Content Include="Content\apexcharts\locales\zh-tw.json" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-3.7.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.1.js" />
     <Content Include="Scripts\jquery-3.7.1.min.js" />
