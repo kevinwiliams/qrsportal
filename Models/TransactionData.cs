@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QRSPortal2.ModelsDB;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -19,5 +20,6 @@ namespace QRSPortal2.Models
         public List<TransactionData> WeeklyData { get; set; }
         public List<TransactionData> MonthlyData { get; set; }
         public List<TransactionData> DailyData { get; set; }
+        public List<QRSActivityLog> ActivityLogs { get; set; }
     }
 }

@@ -24,143 +24,202 @@
     </div>
 </div>
 
-<section class="section">
+<section class="section dashboard">
     <div class="row">
 
         <div class="col-lg-6">
             <div class="card">
+                <div class="filter">
+                    <a class="icon" href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots"></i></a>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow" style="">
+                        <li class="dropdown-header text-start">
+                            <h6>Filter</h6>
+                        </li>
+
+                        <li><a class="dropdown-item chart-filter" href="#" data-value="daily">Daily</a></li>
+                        <li><a class="dropdown-item chart-filter" href="#" data-value="weekly">Weekly</a></li>
+                        <li><a class="dropdown-item chart-filter" href="#" data-value="monthly">Monthly</a></li>
+                    </ul>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title">Weekly Returns</h5>
+                    <h5 class="card-title">Returns <span id="retInterval"></span></h5>
                     <!-- Line Chart -->
-                    <div id="weeklyChart"></div>
+                    <div id="returnsChart"></div>
 
-                    <script>
-                        @{
-                            var periodText = Model.WeeklyData.Select(x => "'" + x.PeriodText + "'");
-                            var joinPeriodText = "[" + string.Join(",", periodText) + "]";
-                        }
-                        document.addEventListener("DOMContentLoaded", () => {
-                            var weeklyChartOptions = {
-                                series: [{
-                                            name: 'Total Distributed Amount',
-                                            data: [@String.Join(",", Model.WeeklyData.Select(item => item.TotalDistributionAmount))]
-                                        },
-                                        {
-                                            name: 'Total Return Amount',
-                                            data: [@String.Join(",", Model.WeeklyData.Select(item => item.TotalReturnAmount))]
-                                        },
-                                        {
-                                            name: 'Total Confirmed Amount',
-                                            data: [@String.Join(",", Model.WeeklyData.Select(item => item.TotalConfirmedAmount))]
-                                          }],
-                                chart: {
-                                    height: 350,
-                                    type: 'line',
-                                    zoom: {
-                                        enabled: false
-                                    }
-                                },
-                                dataLabels: {
-                                    enabled: false
-                                },
-                                stroke: {
-                                    curve: 'straight'
-                                },
-                                grid: {
-                                    row: {
-                                        colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-                                        opacity: 0.5
-                                    },
-                                },
-                                xaxis: {
-                                    categories: @Html.Raw(joinPeriodText),
-                                    title: {
-                                            text: 'Week'
-                                          }
-                                },
-                                 yaxis: {
-                                      title: {
-                                        text: 'Distributions'
-                                          }
-                                    },
-                            };
 
-                            var weeklyChart = new ApexCharts(document.querySelector("#weeklyChart"), weeklyChartOptions);
-                            weeklyChart.render();
-                        });
-                    </script>
                     <!-- End Line Chart -->
 
                 </div>
             </div>
         </div>
-
         <div class="col-lg-6">
+            <!-- Recent Activity -->
             <div class="card">
+                <div class="filter">
+                    <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                        <li class="dropdown-header text-start">
+                            <h6>Menu</h6>
+                        </li>
+
+                        <li><a class="dropdown-item" href="#">View all</a></li>
+
+                    </ul>
+                </div>
+
                 <div class="card-body">
-                    <h5 class="card-title">Monthly Returns</h5>
-                    <!-- Line Chart -->
-                    <div id="monthlyChart"></div>
+                    <h5 class="card-title">Recent Activity <span>| Active</span></h5>
 
-                    <script>
-                         @{
-                            var periodTextM = Model.MonthlyData.Select(x => "'" + x.PeriodText + "'");
-                            var joinPeriodTextM = "[" + string.Join(",", periodTextM) + "]";
+                    <div class="activity">
+                        @foreach (var item in Model.ActivityLogs)
+                        {
+                            var indicator = (item.Status == "Open") ? "text-success" : "text-danger";
+                            var actionTaken = (item.Status == "Open") ? "returned" : "confirmed";
+
+                            <div class="activity-item d-flex">
+                                <div class="activite-label">@item.LogInformation</div>
+                                <i class='bi bi-circle-fill activity-badge @indicator align-self-start'></i>
+                                <div class="activity-content">
+                                    @item.UserName (<a href="#" class="fw-bold text-dark">@item.AccountID</a>) @actionTaken @item.ReturnAmount for @item.PublicationDate.ToString("MMM-dd")
+                                </div>
+                            </div><!-- End activity item-->
                         }
-                        document.addEventListener("DOMContentLoaded", () => {
-                            var monthlyChartOptions = {
-                                series: [{
-                                            name: 'Total Distributed Amount',
-                                            data: [@String.Join(",", Model.MonthlyData.Select(item => item.TotalDistributionAmount))]
-                                        },
-                                        {
-                                            name: 'Total Return Amount',
-                                            data: [@String.Join(",", Model.MonthlyData.Select(item => item.TotalReturnAmount))]
-                                        },
-                                        {
-                                            name: 'Total Confirmed Amount',
-                                            data: [@String.Join(",", Model.MonthlyData.Select(item => item.TotalConfirmedAmount))]
-                                          }],
-                                chart: {
-                                    height: 350,
-                                    type: 'line',
-                                    zoom: {
-                                        enabled: false
-                                    }
-                                },
-                                dataLabels: {
-                                    enabled: false
-                                },
-                                stroke: {
-                                    curve: 'straight'
-                                },
-                                grid: {
-                                    row: {
-                                        colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-                                        opacity: 0.5
-                                    },
-                                },
-                                xaxis: {
-                                    categories: @Html.Raw(joinPeriodTextM),
-                                    title: {
-                                            text: 'Month'
-                                          }
-                                },
-                                 yaxis: {
-                                      title: {
-                                        text: 'Distributions'
-                                          }
-                                    },
-                            };
+                        
 
-                            var monthlyChart = new ApexCharts(document.querySelector("#monthlyChart"), monthlyChartOptions);
-                            monthlyChart.render();
-                        });
-                    </script>
-                    <!-- End Line Chart -->
+                    </div>
 
                 </div>
-            </div>
+            </div><!-- End Recent Activity -->
         </div>
+
+
     </div>
 </section>
+@Scripts.Render("~/bundles/jquery")
+
+<script>
+    var retChartdefault = 'daily';
+
+    function toSentenceCase(text) {
+        return text.toLowerCase().replace(/(^|\. *)([a-z])/g, function(match, separator, char) {
+            return separator + char.toUpperCase();
+        });
+    }
+
+    function renderChart(transactionData, intervals) {
+        
+        var chartOptions = {
+            series: [{
+                name: 'Distributed',
+                data: transactionData.map(function (item) { return item.TotalDistributionAmount; })
+            },
+            {
+                name: 'Return',
+                data: transactionData.map(function (item) { return item.TotalReturnAmount; })
+            },
+            {
+                name: 'Confirmed',
+                data: transactionData.map(function (item) { return item.TotalConfirmedAmount; })
+            }],
+            chart: {
+                height: 350,
+                type: 'line',
+                zoom: {
+                    enabled: false
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'straight'
+            },
+            grid: {
+                row: {
+                    colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                    opacity: 0.5
+                },
+            },
+            xaxis: {
+                categories: transactionData.map(function (item) { return  item.PeriodText }),
+                //title: {
+                //    text: intervals
+                //}
+            },
+            yaxis: {
+                title: {
+                    text: 'Distributions'
+                }
+            },
+        };
+
+        var returnsChart = new ApexCharts(document.querySelector("#returnsChart"), chartOptions);
+
+        // Clear chart data by setting an empty array for series data
+        /*returnsChart.updateSeries([{
+            name: 'Distributed',
+            data: []
+        }, {
+            name: 'Return',
+            data: []
+        }, {
+            name: 'Confirmed',
+            data: []
+        }]);*/
+
+        // Render the chart with new data
+        /*returnsChart.updateOptions({
+            xaxis: {
+                categories: transactionData.map(function (item) { return  item.PeriodText }),
+            },
+            series: [{
+                name: 'Total Distributed Amount',
+                data: transactionData.map(function (item) { return item.TotalDistributionAmount; })
+            }, {
+                name: 'Total Return Amount',
+                data: transactionData.map(function (item) { return item.TotalReturnAmount; })
+            }, {
+                name: 'Total Confirmed Amount',
+                data: transactionData.map(function (item) { return item.TotalConfirmedAmount; })
+            }]
+        });*/
+        returnsChart.render();
+    }
+
+    function loadReturnsChart(filterValue) {
+        
+        $.ajax({
+                url: '@Url.Action("GetChartData", "Home")',
+                type: 'POST',
+                data: { aggregationType: filterValue },
+                success: function (response) {
+                    console.log('response' + response.success);
+                    if (response.success) {
+                        renderChart(response.data, filterValue);
+                        var interval = '| ' + toSentenceCase(filterValue);
+                        $('#retInterval').html(interval)
+                    } else {
+                       console.error('Error:', response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                   console.error('AJAX Error:', error);
+               }
+            });
+    }
+
+    $(document).ready(function () {
+         loadReturnsChart(retChartdefault);
+        // Click event handler for dropdown items
+        $('.chart-filter').on('click', function (e) {
+            e.preventDefault(); // Prevent the default action of the anchor element
+
+            // Get the value of the data-value attribute
+            var filterValue = $(this).data('value') || retChartdefault;
+            console.log(filterValue);
+            loadReturnsChart(filterValue);
+            
+        });
+    });
+
+</script>
