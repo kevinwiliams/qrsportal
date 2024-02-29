@@ -1,4 +1,5 @@
-﻿using QRSPortal2.Models;
+﻿using Microsoft.AspNet.Identity;
+using QRSPortal2.Models;
 using QRSPortal2.ModelsDB;
 using System;
 using System.Collections.Generic;
@@ -18,8 +19,16 @@ namespace QRSPortal2.Controllers
         {
             if (Request.IsAuthenticated)
             {
-                ViewData["UserRole"] = (User.IsInRole("Retailer") ? "Retailer" : (User.IsInRole("Circulation") ? "Circulation" : (User.IsInRole("Supervisor") ? "Supervisor" : "Admin")));
-                ViewData["UserName"] = _db.Users.FirstOrDefault(x => x.Email == User.Identity.Name).FullName;
+                AccountController ac = new AccountController();
+                ac.InitializeController(this.Request.RequestContext);
+
+                var userData = ac.GetUserData();
+                userData["UserRole"] = (User.IsInRole("Retailer") ? "Retailer" : (User.IsInRole("Circulation") ? "Circulation" : (User.IsInRole("Supervisor") ? "Supervisor" : "Admin")));
+                var userId = User.Identity.GetUserId();
+                userData["UserName"] = _db.Users.AsNoTracking().FirstOrDefault(x => x.Id == userId)?.FullName;
+
+                ViewData["UserRole"] = ac.GetUserData()["UserRole"];
+                ViewData["UserName"] = ac.GetUserData()["UserName"];
 
 
                 if (User.IsInRole("Circulation") || User.IsInRole("Admin")) {
@@ -339,6 +348,7 @@ namespace QRSPortal2.Controllers
         }
 
         
+
 
     }
 }

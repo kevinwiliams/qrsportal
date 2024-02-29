@@ -1,8 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNet.Identity;
+using Newtonsoft.Json;
 using QRSPortal2.Models;
 using QRSPortal2.ModelsDB;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net.Http;
@@ -16,6 +18,8 @@ namespace QRSPortal2.Controllers
 {
     public class DistributionController : Controller
     {
+        private ApplicationDbContext _db = new ApplicationDbContext();
+
         // GET: Distribution
         public ActionResult Index()
         {
@@ -64,14 +68,16 @@ namespace QRSPortal2.Controllers
 
                     var startDate = "2024-01-01";
                     var endDate = DateTime.Now.ToString("yyyy-MM-dd");
-                    AccountController account = new AccountController();
-                    account.InitializeController(this.Request.RequestContext);
+                    AccountController ac = new AccountController();
+                    ac.InitializeController(this.Request.RequestContext);
 
-                    await account.LoadTransactions(id, startDate, endDate);
+                    await ac.LoadTransactions(id, startDate, endDate);
                 }
 
                 using (var cxt = new ApplicationDbContext())
                 {
+                    AccountController ac = new AccountController();
+                    ac.InitializeController(this.Request.RequestContext);
 
                     var sql = @"SELECT 
                                   T.[AccountID]
@@ -109,7 +115,8 @@ namespace QRSPortal2.Controllers
                         ViewData["Company"] = result.FirstOrDefault().Company;
                         ViewData["Address"] = result.FirstOrDefault().RetailerAddress;
                         ViewData["Retailer"] = result.FirstOrDefault().RetailerName;
-                        ViewData["UserRole"] = (User.IsInRole("Retailer") ? "Retailer" : (User.IsInRole("Circulation") ? "Circulation" : (User.IsInRole("Supervisor") ? "Supervisor" : "Admin")));
+                        ViewData["UserRole"] = ac.GetUserData()["UserRole"];
+                        ViewData["UserName"] = ac.GetUserData()["UserName"];
                     }
                     else
                     {

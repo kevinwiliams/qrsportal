@@ -263,7 +263,7 @@
 
         $('[name=getLatest]').click(function () {
             $('[name=getLatest]').html('Loading...');
-            $('[name=getLatest]').attr('disabled');
+            $('[name=getLatest]').attr('disabled', true);
 
             $.ajax({
                     type: "POST",

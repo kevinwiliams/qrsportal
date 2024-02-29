@@ -21,6 +21,12 @@ namespace QRSPortal2.Controllers
 
         public ActionResult Logs()
         {
+            AccountController ac = new AccountController();
+            ac.InitializeController(this.Request.RequestContext);
+
+            ViewData["UserRole"] = ac.GetUserData()["UserRole"];
+            ViewData["UserName"] = ac.GetUserData()["UserName"];
+
             List<QRSActivityLog> qRSActivityLogs = new List<QRSActivityLog>();
             qRSActivityLogs = _db.QRSActivityLog.AsNoTracking().OrderByDescending(x => x.CreatedAt).ToList();
 
@@ -31,6 +37,9 @@ namespace QRSPortal2.Controllers
         // GET: Activity/Details/5
         public ActionResult History(string id, string pd)
         {
+            AccountController ac = new AccountController();
+            ac.InitializeController(this.Request.RequestContext);
+
             DateTime parsedPubDate;
             List<QRSActivityLog> qRSActivityLogs = new List<QRSActivityLog>();
 
@@ -38,6 +47,9 @@ namespace QRSPortal2.Controllers
             {
                 qRSActivityLogs = _db.QRSActivityLog.AsNoTracking().Where(x => x.AccountID == id && x.PublicationDate == parsedPubDate).OrderByDescending(x => x.CreatedAt).ToList();
                 ViewData["PublicationDate"] = parsedPubDate.ToString("yyyy-MMM-dd");
+                ViewData["UserRole"] = ac.GetUserData()["UserRole"];
+                ViewData["UserName"] = ac.GetUserData()["UserName"];
+
                 return View(qRSActivityLogs);
             }
             return View(qRSActivityLogs);

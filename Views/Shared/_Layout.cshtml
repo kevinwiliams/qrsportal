@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html  lang="en">
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +8,7 @@
     @Styles.Render("~/Content/vendor")
 
 </head>
-@{ 
+@{
     var asideClass = "toggle-sidebar";
     if (Request.IsAuthenticated)
     {
@@ -44,12 +44,12 @@
 
                             <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
                                 <img src="@Url.Content("~/assets/img/profile-pic.jpg")" alt="Profile" class="rounded-circle">
-                                <span class="d-none d-md-block dropdown-toggle ps-2">@HttpContext.Current.User.Identity.Name</span>
+                                <span class="d-none d-md-block dropdown-toggle ps-2">@ViewData["UserName"]</span>
                             </a><!-- End Profile Iamge Icon -->
 
                             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                                 <li class="dropdown-header">
-                                    <h6>@HttpContext.Current.User.Identity.Name</h6>
+                                    <h6>@ViewData["UserName"]</h6>
                                     <span>@ViewData["UserRole"]</span>
                                 </li>
                                 <li>
@@ -150,27 +150,27 @@
 
 
 
-<main id="main" class="main">
-    @{
-        if (Request.IsAuthenticated)
-        {
-            <div class="pagetitle">
-                <h1>@ViewBag.Title</h1>
-                <nav>
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    </ol>
-                </nav>
-            </div><!-- End Page Title -->
+    <main id="main" class="main">
+        @{
+            if (Request.IsAuthenticated)
+            {
+                <div class="pagetitle">
+                    <h1>@ViewBag.Title</h1>
+                    <nav>
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        </ol>
+                    </nav>
+                </div><!-- End Page Title -->
+            }
+
         }
 
-    }
+        <section class="section">
+            @RenderBody()
+        </section>
 
-    <section class="section">
-        @RenderBody()
-    </section>
-
-</main><!-- End #main -->
+    </main><!-- End #main -->
     <!-- ======= Footer ======= -->
     <footer id="footer" class="footer">
         <div class="copyright">

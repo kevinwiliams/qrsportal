@@ -13,10 +13,13 @@ namespace QRSPortal2.Controllers
         // GET: Retailer
         public ActionResult Index()
         {
+            AccountController ac = new AccountController();
+            ac.InitializeController(this.Request.RequestContext);
             try
             {
                 ViewData["Error"] = TempData["Error"];
-                ViewData["UserRole"] = (User.IsInRole("Retailer") ? "Retailer" : (User.IsInRole("Circulation") ? "Circulation" : (User.IsInRole("Supervisor") ? "Supervisor" : "Admin")));
+                ViewData["UserRole"] = ac.GetUserData()["UserRole"];
+                ViewData["UserName"] = ac.GetUserData()["UserName"];
 
                 using (var cxt = new ApplicationDbContext())
                 {

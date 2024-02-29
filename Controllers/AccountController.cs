@@ -714,6 +714,20 @@ namespace QRSPortal2.Controllers
                 return false;
             }
         }
+
+        public Dictionary<string, string> GetUserData()
+        {
+            if (Session["userData"] == null)
+            {
+                // Initialize the dictionary with default values
+                Session["userData"] = new Dictionary<string, string>
+                {
+                    { "UserRole", "" },
+                    { "UserName", "" }
+                };
+            }
+            return (Dictionary<string, string>)Session["userData"];
+        }
         protected override void Dispose(bool disposing)
         {
             if (disposing)
