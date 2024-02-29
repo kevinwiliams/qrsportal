@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<QRSPortal2.ModelsDB.QRSActivityLog>
 
 @{
-    ViewBag.Title = "Show History";
+    ViewBag.Title = "Logs";
 }
 
 <section class="section">
@@ -10,12 +10,15 @@
 
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Publication Date: @ViewData["PublicationDate"]</h5>
+                    <h5 class="card-title">Activity Logs</h5>
 
                     <a href="#" onclick="history.back();" class="btn btn-secondary"><i class="bi bi-box-arrow-in-left"></i> Back</a>
-                    <table class="table table-hover table-striped small dtHistory">
+                    <table class="table table-hover table-striped small dtActLogs">
                         <thead>
                             <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.AccountID)
+                                </th>
                                 <th>
                                     @Html.DisplayNameFor(model => model.IPAddress)
                                 </th>
@@ -45,6 +48,9 @@
                             {
                                 var statusClass = (item.Status == "Closed") ? "bg-danger" : "bg-success";
                             <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AccountID)
+                                </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.IPAddress)
                                 </td>
@@ -85,7 +91,7 @@
 <script>
     $(document).ready(function () {
 
-        $('.dtHistory').DataTable({
+        $('.dtActLogs').DataTable({
             //order: [[1, 'desc']],
             "lengthChange": false,
             //"bFilter": false,
@@ -95,3 +101,4 @@
 
     });
 </script>
+

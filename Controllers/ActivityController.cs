@@ -19,6 +19,15 @@ namespace QRSPortal2.Controllers
             return View();
         }
 
+        public ActionResult Logs()
+        {
+            List<QRSActivityLog> qRSActivityLogs = new List<QRSActivityLog>();
+            qRSActivityLogs = _db.QRSActivityLog.AsNoTracking().OrderByDescending(x => x.CreatedAt).ToList();
+
+            return View(qRSActivityLogs);
+
+        }
+
         // GET: Activity/Details/5
         public ActionResult History(string id, string pd)
         {
