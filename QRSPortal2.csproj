@@ -230,6 +230,7 @@
   <ItemGroup>
     <Content Include="assets\img\logo.png" />
     <Content Include="assets\img\not-found.svg" />
+    <Content Include="assets\img\profile-pic.jpg" />
     <Content Include="Content\apexcharts\apexcharts.amd.js" />
     <Content Include="Content\apexcharts\apexcharts.common.js" />
     <Content Include="Content\apexcharts\apexcharts.css" />
@@ -262,6 +263,7 @@
     <Content Include="Content\simple-datatables\simple-datatables.js" />
     <Content Include="Content\simple-datatables\style.css" />
     <Content Include="Content\style.css" />
+    <Content Include="Content\sweetalert.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -320,6 +322,24 @@
     <Content Include="Content\apexcharts\locales\ua.json" />
     <Content Include="Content\apexcharts\locales\zh-cn.json" />
     <Content Include="Content\apexcharts\locales\zh-tw.json" />
+    <Content Include="bin\regexes\bots.yml" />
+    <Content Include="bin\regexes\client\browsers.yml" />
+    <Content Include="bin\regexes\client\browser_engine.yml" />
+    <Content Include="bin\regexes\client\feed_readers.yml" />
+    <Content Include="bin\regexes\client\libraries.yml" />
+    <Content Include="bin\regexes\client\mediaplayers.yml" />
+    <Content Include="bin\regexes\client\mobile_apps.yml" />
+    <Content Include="bin\regexes\client\pim.yml" />
+    <Content Include="bin\regexes\device\cameras.yml" />
+    <Content Include="bin\regexes\device\car_browsers.yml" />
+    <Content Include="bin\regexes\device\consoles.yml" />
+    <Content Include="bin\regexes\device\mobiles.yml" />
+    <Content Include="bin\regexes\device\notebooks.yml" />
+    <Content Include="bin\regexes\device\portable_media_player.yml" />
+    <Content Include="bin\regexes\device\shell_tv.yml" />
+    <Content Include="bin\regexes\device\televisions.yml" />
+    <Content Include="bin\regexes\oss.yml" />
+    <Content Include="bin\regexes\vendorfragments.yml" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-3.7.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.1.js" />
@@ -333,6 +353,8 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\main.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Scripts\sweetalert-dev.js" />
+    <Content Include="Scripts\sweetalert.min.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
