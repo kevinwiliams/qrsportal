@@ -214,7 +214,27 @@ namespace QRSPortal2.Controllers
            
         }
 
-        
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<JsonResult> GetLatest(string id)
+        {
+            try
+            {
+                var startDate = GetLastDistDate(id).ToString("yyyy-MM-dd");
+                var endDate = DateTime.Now.ToString("yyyy-MM-dd");
+                AccountController account = new AccountController();
+                account.InitializeController(this.Request.RequestContext);
+
+                return Json(new { success = await account.LoadTransactions(id, startDate, endDate)});
+            }
+            catch (Exception ex)
+            {
+                Util.LogError(ex);
+                return Json(new { success = false });
+            }
+        }
+
         // GET: Distribution/Create
         public ActionResult Create()
     {
@@ -291,6 +311,26 @@ namespace QRSPortal2.Controllers
                 {
                     var v = dc.CircProTranx.Where(a => a.AccountID == accountID).FirstOrDefault();
                     return v != null;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+
+        [NonAction]
+        public DateTime GetLastDistDate(string accountID)
+        {
+
+            try
+            {
+                using (ApplicationDbContext dc = new ApplicationDbContext())
+                {
+                    var v = dc.CircProTranx.Where(a => a.AccountID == accountID).OrderByDescending(x => x.PublicationDate).FirstOrDefault().PublicationDate;
+                    return v.AddDays(1);
                 }
             }
             catch (Exception ex)

@@ -10,7 +10,12 @@
 
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Account: @ViewData["AccountId"]</h5>
+                    @*<h5 class="card-title">Account: @ViewData["AccountId"]</h5>*@
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Account: @ViewData["AccountId"]</h5>
+                        @*<button type="button" class="btn btn-primary btn-sm">Get Latest</button>*@
+                        <button type="button" class="btn btn-success btn-sm" name="getLatest" id="getLatest"><i class="bi bi-box-arrow-in-down"></i></button>
+                    </div>
                     <div class="row small mb-3">
                         @*<div class="col-lg-3 col-md-4 label">Delivery Address</div>*@
                         <div class="col-lg-9 col-md-8">@ViewData["Company"]<br>@ViewData["Address"]<br>@ViewData["Retailer"] </div>
@@ -253,6 +258,45 @@
                     'Avg. Returns: ' + avg.toFixed(2);
                 
             },
+
+        });
+
+        $('[name=getLatest]').click(function () {
+            $('[name=getLatest]').html('Loading...');
+            $('[name=getLatest]').attr('disabled');
+
+            $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("getlatest", "distribution")',
+                    dataType: 'json',
+                    data: { id: $('#accountId').val() },
+                success: function (response) {
+
+                     if (response.success) {
+                       console.log(response.success);
+
+                        swal({
+                            title: "Success!",
+                            text: "Latest information has been pulled!",
+                            type: "success",
+                            dangerMode: false
+                        });
+
+                        setTimeout(
+                            ReloadPage
+                            , 2000);
+                    } else {
+                       swal({
+                            title: "Error!",
+                            text: "Something went wrong| Please try again later!",
+                            type: "warning",
+                            dangerMode: false
+                        });
+                    }
+                        
+                       
+                    }
+                });
 
         });
 

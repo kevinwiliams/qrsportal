@@ -682,7 +682,7 @@ namespace QRSPortal2.Controllers
                                     ConfirmReturn = true,
                                     CreatedAt = item.PUBLISH,
                                     UpdatedAt = DateTime.Now,
-                                    Status = "Closed",
+                                    Status = "Open",
                                     EmailAddress = circUser.EmailAddress,
                                     ReturnAmount = item.RETTOT,
                                     ReturnDate = item.PUBLISH,
