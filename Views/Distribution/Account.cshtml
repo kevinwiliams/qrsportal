@@ -193,6 +193,8 @@
                 //Serialize the form datas.   
                 var returnsData = $("[name=returnForm] :input").serialize();
                 //console.log(returnsData);
+                $('#updateBtn').attr('disabled', true);
+                $('#updateBtn').html('Loading..');
 
                 $.ajax({
                     type: "POST",
@@ -211,7 +213,7 @@
 
                         setTimeout(
                             ReloadPage
-                            , 2000);
+                            , 2500);
                         
                         // Clear the modal fields
                         $('#publicationDate').val('');
@@ -284,7 +286,7 @@
 
                         setTimeout(
                             ReloadPage
-                            , 2000);
+                            , 2500);
                     } else {
                        swal({
                             title: "Error!",

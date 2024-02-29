@@ -3,6 +3,11 @@
 @{
     ViewBag.Title = "All Agents";
 }
+<div id="loadingScreen">
+    <!-- Loading screen content goes here -->
+    <div class="loader"></div>
+    <p>Loading...</p>
+</div>
 <section class="section">
     <div class="row">
         <div class="col-lg-12">
@@ -24,8 +29,8 @@
                                     @Html.DisplayNameFor(model => model.RetailerName)
                                 </th>
                                 @*<th>
-                                    @Html.DisplayNameFor(model => model.EmailAddress)
-                                </th>*@
+                                        @Html.DisplayNameFor(model => model.EmailAddress)
+                                    </th>*@
                                 <th>
                                     @Html.DisplayNameFor(model => model.Company)
                                 </th>
@@ -46,8 +51,8 @@
                             {
                                 <tr>
                                     <td>
-                                        <a href="@Url.Action("account", "distribution", new { id = item.AccountID })"> @Html.DisplayFor(modelItem => item.AccountID)</a>
-</td>
+                                        <a href="@Url.Action("account", "distribution", new { id = item.AccountID })" id="loadAccount" name="loadAccount"> @Html.DisplayFor(modelItem => item.AccountID)</a>
+                                    </td>
                                     <td>
                                         @Html.DisplayFor(modelItem => item.DistributionID)
                                     </td>
@@ -55,8 +60,8 @@
                                         @Html.DisplayFor(modelItem => item.RetailerName)
                                     </td>
                                     @*<td>
-                                        @Html.DisplayFor(modelItem => item.EmailAddress)
-                                    </td>*@
+                                            @Html.DisplayFor(modelItem => item.EmailAddress)
+                                        </td>*@
                                     <td>
                                         @Html.DisplayFor(modelItem => item.Company)
                                     </td>
@@ -70,7 +75,7 @@
                                         @Html.DisplayFor(modelItem => item.CellNumber)
                                     </td>
                                     <td>
-                                        <a href="@Url.Action("account", "distribution", new { id = item.AccountID })"><i class="bi bi-box-arrow-up-right"></i></a>
+                                        <a href="@Url.Action("account", "distribution", new { id = item.AccountID })" id="loadAccount" name="loadAccount"><i class="bi bi-box-arrow-up-right"></i></a>
 
                                     </td>
                                 </tr>
@@ -86,22 +91,32 @@
 </section>
 <input type="hidden" name="error" id="error" value="@TempData["Error"]" />
 @Scripts.Render("~/bundles/jquery")
+<script src="~/Scripts/addons.js"></script>
 
 <script>
+    showLoadingScreen();
+
+    $('[name=loadAccount]').on('click', function (e) { showLoadingScreen(); });
+
     $(document).ready(function () {
+
+        hideLoadingScreen();
+
         var showError = $('#error').val();
-            if (showError) {
-                swal({
+        if (showError) {
+            swal({
                 title: "Error!",
                 text: "No records found for the account",
                 type: "warning",
                 dangerMode: true
             });
+
+            hideLoadingScreen();
         }
 
         console.log($('[name=error]').val())
         $('.dtRetailers').DataTable({
-           order: [[0, 'desc']],
+            order: [[0, 'desc']],
             pageLength: 15,
             "lengthChange": false,
             responsive: true,

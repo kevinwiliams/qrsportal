@@ -29,7 +29,8 @@ namespace QRSPortal2
                       "~/Scripts/sweetalert.min.js",
                      "~/Content/simple-datatables/simple-datatables.js",
                      "~/Content/apexcharts/apexcharts.min.js",
-                     "~/Scripts/main.js"));
+                     "~/Scripts/main.js",
+                     "~/Scripts/addons.js"));
 
             bundles.Add(new StyleBundle("~/Content/vendor").Include(
                     "~/Content/bootstrap-icons/bootstrap-icons.css",

@@ -38,7 +38,7 @@
                             Confirm Return Amount
                         </label>
                     </div>
-                    <button type="submit" class="btn btn-primary m-2 mb-0">Update</button>
+                    <button type="submit" class="btn btn-primary m-2 mb-0" id="updateBtn" name="updateBtn">Update</button>
                 </form>
                 <div class="row mt-4">
                     <div class="col-12 align-content-center">
@@ -51,8 +51,6 @@
                                 User: <span id="lastUser"></span><br>
                                 Return: <span id="lastRet"></span>
                             </p>
-
-                        @*<a class="small" href="@Url.Action("History", "Activity", new { id = ViewData["AccountId"], pd = ViewData["PubDate"] })">Show History</a>*@
                         <a id="historyLink" class="small" href="#">Show History</a>
                     </div>
                 </div>
