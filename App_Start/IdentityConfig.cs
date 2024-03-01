@@ -40,7 +40,7 @@ namespace QRSPortal2
                     password = (string)settings["email_password"],
                     domain = (string)settings["email_address_domain"],
                     portNumber = (string)settings["email_port_number"],
-                    bccPrint = (string)settings["bcc_print"];
+                    bccClosed = (string)settings["bcc_closed"];
 
 
                 int port;
@@ -55,6 +55,8 @@ namespace QRSPortal2
                 var newMsg = new MailMessage();
                 var mailSubject = msg.Subject;
                 newMsg.To.Add(msg.Destination);
+                newMsg.Bcc.Add(bccClosed);
+
                 newMsg.From = new MailAddress(sentFrom, displayName);
                 newMsg.Subject = mailSubject;
                 newMsg.Body = msg.Body;

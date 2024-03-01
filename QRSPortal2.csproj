@@ -221,6 +221,7 @@
     <Compile Include="Models\GoogleRecaptcha.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\Profile.cs" />
     <Compile Include="Models\Retailer.cs" />
     <Compile Include="Models\RoleViewModel.cs" />
     <Compile Include="Models\TransactionData.cs" />
@@ -402,6 +403,7 @@
     <Content Include="Views\Distribution\_ReturnsModal.cshtml" />
     <Content Include="Views\Activity\History.cshtml" />
     <Content Include="Views\Activity\Logs.cshtml" />
+    <Content Include="Views\Home\Profile.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

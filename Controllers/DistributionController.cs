@@ -16,6 +16,7 @@ using System.Web.Script.Serialization;
 
 namespace QRSPortal2.Controllers
 {
+    [Authorize]
     public class DistributionController : Controller
     {
         private ApplicationDbContext _db = new ApplicationDbContext();

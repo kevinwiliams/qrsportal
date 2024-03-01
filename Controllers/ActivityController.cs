@@ -9,6 +9,7 @@ using System.Web.Mvc;
 
 namespace QRSPortal2.Controllers
 {
+    [Authorize]
     public class ActivityController : Controller
     {
         private ApplicationDbContext _db = new ApplicationDbContext();

@@ -26,12 +26,13 @@ namespace QRSPortal2.Controllers
                 userData["UserRole"] = (User.IsInRole("Retailer") ? "Retailer" : (User.IsInRole("Circulation") ? "Circulation" : (User.IsInRole("Supervisor") ? "Supervisor" : "Admin")));
                 var userId = User.Identity.GetUserId();
                 userData["UserName"] = _db.Users.AsNoTracking().FirstOrDefault(x => x.Id == userId)?.FullName;
+                Session["accountId"] = _db.CircproUsers.AsNoTracking().FirstOrDefault(x => x.UserID == userId)?.AccountID;
 
                 ViewData["UserRole"] = ac.GetUserData()["UserRole"];
                 ViewData["UserName"] = ac.GetUserData()["UserName"];
 
-
-                if (User.IsInRole("Circulation") || User.IsInRole("Admin")) {
+                if (User.IsInRole("Circulation") || User.IsInRole("Admin"))
+                {
                     try
                     {
                         //List<TransactionData> weeklyData = GetWeeklyTransactionData();
@@ -53,7 +54,7 @@ namespace QRSPortal2.Controllers
                         throw ex;
                     }
                 }
-                   
+
 
                 if (User.IsInRole("Supervisor") || User.IsInRole("Retailer"))
                 {
@@ -208,7 +209,7 @@ namespace QRSPortal2.Controllers
                                 TotalDistributionAmount = g.Sum(t => t.DistributionAmount),
                                 TotalReturnAmount = (int)g.Sum(t => t.ReturnAmount),
                                 TotalConfirmedAmount = (int)g.Sum(t => t.ConfirmedAmount)
-                            }).OrderBy(g => g.PeriodNumber); 
+                            }).OrderBy(g => g.PeriodNumber);
                         break;
                     case "weekly":
                         query = _db.CircProTranx.AsNoTracking()
@@ -220,7 +221,7 @@ namespace QRSPortal2.Controllers
                                 TotalDistributionAmount = g.Sum(t => t.DistributionAmount),
                                 TotalReturnAmount = (int)g.Sum(t => t.ReturnAmount),
                                 TotalConfirmedAmount = (int)g.Sum(t => t.ConfirmedAmount)
-                            }).OrderBy(g => g.PeriodNumber); 
+                            }).OrderBy(g => g.PeriodNumber);
                         break;
                     case "daily":
                         query = _db.CircProTranx.AsNoTracking()
@@ -232,7 +233,7 @@ namespace QRSPortal2.Controllers
                                 TotalDistributionAmount = (int)g.Sum(t => t.DistributionAmount),
                                 TotalReturnAmount = (int)g.Sum(t => t.ReturnAmount),
                                 TotalConfirmedAmount = (int)g.Sum(t => t.ConfirmedAmount)
-                            }).OrderBy(g => g.PeriodNumber); 
+                            }).OrderBy(g => g.PeriodNumber);
                         break;
                     default:
                         return Json(new { success = false, message = "Invalid aggregation type" });
@@ -265,44 +266,105 @@ namespace QRSPortal2.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
-    
 
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
 
-            return View();
+        public new ActionResult Profile()
+        {
+            try
+            {
+                AccountController ac = new AccountController();
+                ac.InitializeController(this.Request.RequestContext);
+                var accountId = (string)Session["accountId"];
+                var profile = (from user in _db.CircproUsers
+                               join address in _db.CircProAddress on user.UserID equals address.UserID
+                               where user.AccountID == accountId
+                               select new Profile
+                               {
+                                   RetailerName = user.FirstName + " " + user.LastName,
+                                   Address = address.AddressLine1.Trim() + " " + address.AddressLine2.Trim() + " " + address.CityTown.Trim() + " " + address.StateParish.Trim(),
+                                   RetailerInfo = user,
+                                   RetailerAddress = address
+                               }).FirstOrDefault();
+
+                if (profile == null)
+                {
+                    profile = new Models.Profile();
+                }
+
+                // Additional logic if needed
+                ViewData["UserRole"] = ac.GetUserData()["UserRole"];
+                ViewData["UserName"] = ac.GetUserData()["UserName"];
+                return View(profile);
+            }
+            catch (Exception ex)
+            {
+
+                Util.LogError(ex);
+                return View("index");
+
+            }
         }
 
-        public ActionResult Contact()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public new ActionResult Profile(string id, Profile updatedProfile)
         {
-            ViewBag.Message = "Your contact page.";
+            if (!ModelState.IsValid)
+            {
+                // If the model state is not valid, return the view with validation errors
+                return View(updatedProfile);
+            }
 
-            return View();
-        }
-        [Authorize]
-        public ActionResult Retailer()
-        {
-            return View();
-        }
-        [Authorize]
-        public ActionResult EnterReturn(string showInputConfirm) 
-        {
-            ViewBag.ShowConfirm = showInputConfirm;
-            return View();
-        }
-        [Authorize]
-        public ActionResult ShowHistory()
-        {
-            return View();
-        }
-        [Authorize]
-        public ActionResult Circulation()
-        {
-            return View();
-        }
+            try
+            {
+                // Retrieve the existing profile from the database
+                var existingProfile = (from user in _db.CircproUsers
+                                       join address in _db.CircProAddress on user.UserID equals address.UserID
+                                       where user.AccountID == id
+                                       select new Profile
+                                       {
+                                           RetailerName = user.FirstName + " " + user.LastName,
+                                           Address = address.AddressLine1 + " " + address.AddressLine2 + " " + address.CityTown + " " + address.StateParish,
+                                           RetailerInfo = user,
+                                           RetailerAddress = address
+                                       }).FirstOrDefault();
 
-        public static string FormatRelativeDate(DateTime date)
+                if (existingProfile == null)
+                {
+                    return HttpNotFound();
+                }
+
+                // Update profile data
+                existingProfile.RetailerInfo.AccountID = updatedProfile.RetailerInfo.AccountID;
+                existingProfile.RetailerInfo.DistributionID = updatedProfile.RetailerInfo.DistributionID;
+                existingProfile.RetailerInfo.FirstName = updatedProfile.RetailerInfo.FirstName;
+                existingProfile.RetailerInfo.LastName = updatedProfile.RetailerInfo.LastName;
+                existingProfile.RetailerInfo.EmailAddress = updatedProfile.RetailerInfo.EmailAddress;
+                existingProfile.RetailerInfo.Company = updatedProfile.RetailerInfo.Company;
+
+                // Update address data
+                existingProfile.RetailerAddress.AddressLine1 = updatedProfile.RetailerAddress.AddressLine1;
+                existingProfile.RetailerAddress.AddressLine2 = updatedProfile.RetailerAddress.AddressLine2;
+                existingProfile.RetailerAddress.CityTown = updatedProfile.RetailerAddress.CityTown;
+                existingProfile.RetailerAddress.StateParish = updatedProfile.RetailerAddress.StateParish;
+
+                // Save the changes to the database
+                _db.SaveChanges();
+
+                // Redirect to a success page or return a JSON response indicating success
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+
+                Util.LogError(ex);
+                return RedirectToAction("Profile", "Home");
+            }
+            
+        
+        
+        }
+    public static string FormatRelativeDate(DateTime date)
         {
             TimeSpan timeDifference = DateTime.Now - date;
 

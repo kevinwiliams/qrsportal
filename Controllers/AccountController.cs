@@ -728,6 +728,15 @@ namespace QRSPortal2.Controllers
             }
             return (Dictionary<string, string>)Session["userData"];
         }
+
+        public string GetAccountId()
+        {
+            if (Session["accountId"] == null)
+            {
+                Session["accountId"] = "";
+            }
+            return (string)Session["accountId"];
+        }
         protected override void Dispose(bool disposing)
         {
             if (disposing)
