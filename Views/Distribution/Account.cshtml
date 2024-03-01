@@ -264,7 +264,8 @@
         });
 
         $('[name=getLatest]').click(function () {
-            $('[name=getLatest]').html('Loading...');
+            var spinner = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
+            $('[name=getLatest]').html(spinner);
             $('[name=getLatest]').attr('disabled', true);
 
             $.ajax({
