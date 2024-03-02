@@ -832,6 +832,7 @@ namespace QRSPortal2
                 cmd.Parameters.AddWithValue("EmailAddress", actLog.EmailAddress);
                 cmd.Parameters.AddWithValue("PublicationDate", actLog.PublicationDate);
                 cmd.Parameters.AddWithValue("ReturnAmount", actLog.ReturnAmount);
+                cmd.Parameters.AddWithValue("DistributionAmount", actLog.DistributionAmount);
                 cmd.Parameters.AddWithValue("Status", actLog.Status);
                 cmd.Parameters.AddWithValue("IPAddress", GetIPAddress());
                 cmd.Parameters.AddWithValue("LogInformation", actLog.LogInformation);

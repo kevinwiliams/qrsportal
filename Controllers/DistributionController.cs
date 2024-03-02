@@ -148,6 +148,7 @@ namespace QRSPortal2.Controllers
                 // Access form data using the collection parameter
                 string accountId = frm["accountId"];
                 string returnAmount = frm["returnAmount"];
+                string drawAmount = frm["drawAmount"];
                 string confirmAmount = frm["confirmAmount"];
                 string publicationDate = frm["publicationDate"];
                 string loggedEmail = frm["loggedEmail"];
@@ -195,6 +196,7 @@ namespace QRSPortal2.Controllers
                                 UserName = cxt.Users.FirstOrDefault(x => x.Email == loggedEmail).FullName,
                                 EmailAddress = loggedEmail,
                                 PublicationDate = parsedPublicationDate,
+                                DistributionAmount = Convert.ToInt32(drawAmount),
                                 ReturnAmount = returnCount,
                                 Status = retStatus
                             };

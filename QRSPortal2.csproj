@@ -342,6 +342,7 @@
     <Content Include="bin\regexes\device\televisions.yml" />
     <Content Include="bin\regexes\oss.yml" />
     <Content Include="bin\regexes\vendorfragments.yml" />
+    <Content Include="App_Data\email_settings.json" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-3.7.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.1.js" />

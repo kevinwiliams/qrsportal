@@ -25,6 +25,8 @@ namespace QRSPortal2.ModelsDB
         public DateTime PublicationDate { get; set; }
         [Display(Name = "RET")]
         public int ReturnAmount { get; set; }
+        [Display(Name = "DRAW")]
+        public int DistributionAmount { get; set; }
         [StringLength(10)]
         public string Status { get; set; }
         [Display(Name = "Updated")]

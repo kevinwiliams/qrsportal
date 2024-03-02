@@ -1,0 +1,15 @@
+﻿{
+  "email_address_from": "Jamaica Observer",
+  "smtp_host": "smtp.gmail.com",
+  "ssl_enabled": "True",
+  "email_password": "kdwolloddanxtwje", /*Using App Password*/
+  "email_address": "circulation@jamaicaobserver.com",
+  "email_address_username": "caribbusinessreport@gmail.com",
+  "email_address_domain": "jamobsvr.com",
+  "email_port_number": "587",
+  "bcc_closed": "williamskt@jamaicaobserver.com, iamteddikev@gmail.com",
+  //"bcc_closed": "circulation@jamaicaobserver.com, williamskt@jamaicaobserver.com, morgano@jamaicaobserver.com, reids@jamaicaobserver.com",
+  "bcc_epaper": "williamskt@jamaicaobserver.com",
+  "feedback_email": "williamskt@jamaicaobserver.com"
+
+}

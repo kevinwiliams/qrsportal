@@ -148,6 +148,7 @@
             //console.log($(this).find(':first-child').val());
             //console.log($(this));
             var returnAmt = $(this).closest('tr').find('input#item_ReturnAmount').val();
+            var drawAmt = $(this).closest('tr').find('input#item_DistributionAmount').val();
             var confirmAmt = $(this).closest('tr').find('input#item_ConfirmedAmount').val();
             //console.log('returnAmt', returnAmt);
             publicationDate = $(this).find(':first-child').val();
@@ -155,6 +156,7 @@
             $('#publicationDate').val(publicationDate);
             $('#pubDateModal').html( $('#publicationDate').val());
             $('#returnAmount').val(returnAmt);
+            $('#drawAmount').val(drawAmt);
             $('#confirmAmount').val(confirmAmt);
 
             var parts = publicationDate.split(/[\s/:]/); // Split the date string using whitespace, "/", ":", and ":"
