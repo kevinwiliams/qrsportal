@@ -61,20 +61,22 @@
                     <h5 class="card-title">Recent Activity <span>| Active</span></h5>
 
                     <div class="activity">
-                        @foreach (var item in Model.ActivityLogs)
+                        @if (Model != null)
                         {
-                            var indicator = (item.Status == "Open") ? "text-success" : "text-danger";
-                            var actionTaken = (item.Status == "Open") ? "returned" : "confirmed";
+                            foreach (var item in Model.ActivityLogs)
+                            {
+                                var indicator = (item.Status == "Open") ? "text-success" : "text-danger";
+                                var actionTaken = (item.Status == "Open") ? "returned" : "confirmed";
 
-                            <div class="activity-item d-flex">
-                                <div class="activite-label">@item.LogInformation</div>
-                                <i class='bi bi-circle-fill activity-badge @indicator align-self-start'></i>
-                                <div class="activity-content">
-                                    @item.UserName (<a href="@Url.Action("account", "distribution", new { id = item.AccountID })" class="fw-bold text-dark">@item.AccountID</a>) @actionTaken @item.ReturnAmount for @item.PublicationDate.ToString("MMM-dd")
-                                </div>
-                            </div><!-- End activity item-->
+                                <div class="activity-item d-flex">
+                                    <div class="activite-label">@item.LogInformation</div>
+                                    <i class='bi bi-circle-fill activity-badge @indicator align-self-start'></i>
+                                    <div class="activity-content">
+                                        @item.UserName (<a href="@Url.Action("account", "distribution", new { id = item.AccountID })" class="fw-bold text-dark">@item.AccountID</a>) @actionTaken @item.ReturnAmount for @item.PublicationDate.ToString("MMM-dd")
+                                    </div>
+                                </div><!-- End activity item-->
+                            }
                         }
-                        
 
                     </div>
 

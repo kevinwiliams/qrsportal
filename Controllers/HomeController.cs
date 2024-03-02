@@ -307,7 +307,7 @@ namespace QRSPortal2.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public new ActionResult Profile(string id, Profile updatedProfile)
+        public new ActionResult Profile(Profile updatedProfile)
         {
             if (!ModelState.IsValid)
             {
@@ -320,7 +320,7 @@ namespace QRSPortal2.Controllers
                 // Retrieve the existing profile from the database
                 var existingProfile = (from user in _db.CircproUsers
                                        join address in _db.CircProAddress on user.UserID equals address.UserID
-                                       where user.AccountID == id
+                                       where user.AccountID == updatedProfile.RetailerInfo.AccountID
                                        select new Profile
                                        {
                                            RetailerName = user.FirstName + " " + user.LastName,
@@ -335,12 +335,12 @@ namespace QRSPortal2.Controllers
                 }
 
                 // Update profile data
-                existingProfile.RetailerInfo.AccountID = updatedProfile.RetailerInfo.AccountID;
-                existingProfile.RetailerInfo.DistributionID = updatedProfile.RetailerInfo.DistributionID;
                 existingProfile.RetailerInfo.FirstName = updatedProfile.RetailerInfo.FirstName;
                 existingProfile.RetailerInfo.LastName = updatedProfile.RetailerInfo.LastName;
                 existingProfile.RetailerInfo.EmailAddress = updatedProfile.RetailerInfo.EmailAddress;
                 existingProfile.RetailerInfo.Company = updatedProfile.RetailerInfo.Company;
+                existingProfile.RetailerInfo.Company = updatedProfile.RetailerInfo.PhoneNumber;
+                existingProfile.RetailerInfo.Company = updatedProfile.RetailerInfo.CellNumber;
 
                 // Update address data
                 existingProfile.RetailerAddress.AddressLine1 = updatedProfile.RetailerAddress.AddressLine1;
@@ -352,7 +352,7 @@ namespace QRSPortal2.Controllers
                 _db.SaveChanges();
 
                 // Redirect to a success page or return a JSON response indicating success
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Profile", "Home");
             }
             catch (Exception ex)
             {

@@ -99,8 +99,12 @@
     $('[name=loadAccount]').on('click', function (e) { showLoadingScreen(); });
 
     $(document).ready(function () {
+            hideLoadingScreen();
 
-        hideLoadingScreen();
+        // Attach load event handler to the window
+        $(window).on('load', function () {
+            hideLoadingScreen();
+        });
 
         var showError = $('#error').val();
         if (showError) {
