@@ -101,9 +101,12 @@
     $(document).ready(function () {
             hideLoadingScreen();
 
-        // Attach load event handler to the window
-        $(window).on('load', function () {
-            hideLoadingScreen();
+       $(window).on('pageshow', function (event) {
+            // Check if the event's persisted property is false
+            if (event.originalEvent.persisted) {
+                // This means the page is loaded from the cache
+                hideLoadingScreen();
+            }
         });
 
         var showError = $('#error').val();

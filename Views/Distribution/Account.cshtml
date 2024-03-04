@@ -69,6 +69,7 @@
                                         }
                                         @Html.HiddenFor(modelItem => item.ReturnAmount)
                                         @Html.HiddenFor(modelItem => item.ConfirmedAmount)
+                                        @Html.HiddenFor(modelItem => item.DistributionAmount)
 
                                     </td>
                                     <td class="text-center">
@@ -188,6 +189,23 @@
 
         $('#returnForm').submit(function (e) {
             e.preventDefault();
+
+            var drawAmount = parseInt($('#drawAmount').val());
+            var returnAmount = parseInt($('#returnAmount').val());
+            var confirmAmount = parseInt($('#confirmAmount').val());
+
+            // Check if the return amount is greater than the draw amount
+            if (returnAmount > drawAmount || confirmAmount > drawAmount) {
+                // Show an error message
+                swal({
+                        title: "Error!",
+                        text: "Return amount cannot be greater than draw amount!",
+                        type: "warning",
+                        dangerMode: false
+                });
+
+                return;
+            }
 
             let formData = $("[name=returnForm]").valid();
             let Url = $("[name=returnForm]").data("request-url");
