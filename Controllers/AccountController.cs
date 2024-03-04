@@ -715,6 +715,74 @@ namespace QRSPortal2.Controllers
             }
         }
 
+        public async Task<bool> UpdateDistributions(string accountID, string startDate, string endDate)
+        {
+
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    // Define the URL of the ASP page
+                    string url = "https://janus.jamaicaobserver.com/circ/api_acct_date.asp";
+
+                    // Define your form data as key-value pairs
+                    var formData = new Dictionary<string, string>
+                    {
+                        { "account_id", accountID },
+                        { "startDate", startDate },
+                        { "endDate", endDate }
+                    };
+
+                    // Encode the form data
+                    var encodedFormData = new FormUrlEncodedContent(formData);
+
+                    // Set Content-Type header
+                    encodedFormData.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
+
+                    // Send the POST request and get the response
+                    HttpResponseMessage response = await client.PostAsync(url, encodedFormData);
+
+                    // Check if the request was successful
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Read the response content
+                        //string responseContent = await response.Content.ReadAsStringAsync();
+                        var context = new ApplicationDbContext();
+                        var json = await response.Content.ReadAsStringAsync();
+                        var resultTrans = JsonConvert.DeserializeObject<List<CircProDistribution>>(json);
+
+                        foreach (var item in resultTrans)
+                        {
+                            // Assuming circUser is retrieved successfully using DistributionID
+                            var circUser = context.CircProTranx.SingleOrDefault(b => b.AccountID == accountID && b.PublicationDate == item.PUBLISH);
+
+                            if (circUser != null)
+                            {
+                                circUser.DistributionAmount = item.DRAWTOT;
+                                await context.SaveChangesAsync();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // If the request was not successful, output the status code
+                        Console.WriteLine($"Request failed with status code {response.StatusCode}");
+                        return true;
+                    }
+                }
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+
+                //throw ex;
+                LogError(ex);
+                return false;
+            }
+        }
+
         public Dictionary<string, string> GetUserData()
         {
             if (Session["userData"] == null)

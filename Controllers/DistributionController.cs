@@ -20,6 +20,7 @@ namespace QRSPortal2.Controllers
     public class DistributionController : Controller
     {
         private ApplicationDbContext _db = new ApplicationDbContext();
+        private AccountController _ac = new AccountController();
 
         // GET: Distribution
         public ActionResult Index()
@@ -64,70 +65,69 @@ namespace QRSPortal2.Controllers
             try
             {
                 var isLoaded = IsInitLoad(id);
+                _ac.InitializeController(this.Request.RequestContext);
+
 
                 if (!isLoaded) {
 
                     var startDate = "2024-01-01";
                     var endDate = DateTime.Now.ToString("yyyy-MM-dd");
-                    AccountController ac = new AccountController();
-                    ac.InitializeController(this.Request.RequestContext);
-
-                    await ac.LoadTransactions(id, startDate, endDate);
+                    await _ac.LoadTransactions(id, startDate, endDate);
                 }
 
-                using (var cxt = new ApplicationDbContext())
+
+                // Get latest records
+                await GetLatest(id);
+
+                var sql = @"SELECT 
+                                T.[AccountID]
+                                ,T.[DistributionTypeID]
+                                ,T.[PublicationDate]
+                                ,T.[DistributionAmount]
+                                ,T.[ReturnDate]
+                                ,T.[ReturnAmount]
+                                ,T.[ConfirmDate]
+                                ,T.[ConfirmedAmount]
+                                ,T.[ConfirmReturn]
+                                ,T.[Status]
+	                            ,CONCAT(U.FirstName, ' ', U.LastName) AS RetailerName,
+                                U.EmailAddress,
+                                U.Company,
+                                NULLIF(
+                                    COALESCE(LTRIM(RTRIM(A.AddressLine1)) + ', ', '') + 
+                                    COALESCE(LTRIM(RTRIM(A.AddressLine2)) + ', ', '') + 
+                                    COALESCE(LTRIM(RTRIM(A.CityTown)), ''), 
+                                    ''
+                                ) AS RetailerAddress,
+                                U.PhoneNumber,
+                                U.CellNumber
+                            FROM [dbo].[CircProTransactions] T
+                            JOIN [dbo].[CircproUsers] U ON U.AccountID = T.AccountID
+                            JOIN [dbo].[CircProAddresses] A ON U.UserID = A.UserID
+                            WHERE T.[AccountID] = @AccountID 
+                        ORDER BY T.[PublicationDate] DESC";
+                var accountID = new SqlParameter("@AccountID", id);
+                var result = _db.Database.SqlQuery<DistributionData>(sql, accountID).ToList();
+                if (result != null) {
+
+                    //TODO:Loop to trim address field
+                    ViewData["AccountID"] = result.FirstOrDefault().AccountID;
+                    ViewData["Company"] = result.FirstOrDefault().Company;
+                    ViewData["Address"] = result.FirstOrDefault().RetailerAddress;
+                    ViewData["Retailer"] = result.FirstOrDefault().RetailerName;
+                    ViewData["Email"] = result.FirstOrDefault().EmailAddress;
+                    ViewData["Phone"] = result.FirstOrDefault().PhoneNumber + " - " + result.FirstOrDefault().CellNumber;
+                    ViewData["UserRole"] = _ac.GetUserData()["UserRole"];
+                    ViewData["UserName"] = _ac.GetUserData()["UserName"];
+                }
+                else
                 {
-                    AccountController ac = new AccountController();
-                    ac.InitializeController(this.Request.RequestContext);
-
-                    var sql = @"SELECT 
-                                  T.[AccountID]
-                                  ,T.[DistributionTypeID]
-                                  ,T.[PublicationDate]
-                                  ,T.[DistributionAmount]
-                                  ,T.[ReturnDate]
-                                  ,T.[ReturnAmount]
-                                  ,T.[ConfirmDate]
-                                  ,T.[ConfirmedAmount]
-                                  ,T.[ConfirmReturn]
-                                  ,T.[Status]
-	                              ,CONCAT(U.FirstName, ' ', U.LastName) AS RetailerName,
-                                    U.EmailAddress,
-                                    U.Company,
-                                    NULLIF(
-                                        COALESCE(LTRIM(RTRIM(A.AddressLine1)) + ', ', '') + 
-                                        COALESCE(LTRIM(RTRIM(A.AddressLine2)) + ', ', '') + 
-                                        COALESCE(LTRIM(RTRIM(A.CityTown)), ''), 
-                                        ''
-                                    ) AS RetailerAddress,
-                                    U.PhoneNumber,
-                                    U.CellNumber
-                              FROM [dbo].[CircProTransactions] T
-                              JOIN [dbo].[CircproUsers] U ON U.AccountID = T.AccountID
-                              JOIN [dbo].[CircProAddresses] A ON U.UserID = A.UserID
-                                WHERE T.[AccountID] = @AccountID 
-                            ORDER BY T.[PublicationDate] DESC";
-                    var accountID = new SqlParameter("@AccountID", id);
-                    var result =  cxt.Database.SqlQuery<DistributionData>(sql, accountID).ToList();
-                    if (result != null) {
-
-                        //TODO:Loop to trim address field
-                        ViewData["AccountID"] = result.FirstOrDefault().AccountID;
-                        ViewData["Company"] = result.FirstOrDefault().Company;
-                        ViewData["Address"] = result.FirstOrDefault().RetailerAddress;
-                        ViewData["Retailer"] = result.FirstOrDefault().RetailerName;
-                        ViewData["UserRole"] = ac.GetUserData()["UserRole"];
-                        ViewData["UserName"] = ac.GetUserData()["UserName"];
-                    }
-                    else
-                    {
-                        result = new List<DistributionData>();
-                    }
-
-
-                    return View(result);
-
+                    result = new List<DistributionData>();
                 }
+
+
+                return View(result);
+
             }
             catch (Exception ex)
             {
@@ -159,12 +159,11 @@ namespace QRSPortal2.Controllers
 
                 if (DateTime.TryParse(publicationDate, out parsedPublicationDate))
                 {
-                    using (var cxt = new ApplicationDbContext())
-                    {
-                        var pubEntry = cxt.CircProTranx.FirstOrDefault(a => a.AccountID == accountId && a.PublicationDate == parsedPublicationDate);
+                    
+                        var pubEntry = _db.CircProTranx.FirstOrDefault(a => a.AccountID == accountId && a.PublicationDate == parsedPublicationDate);
                         if (pubEntry != null)
                         {
-                            cxt.Entry(pubEntry).State = System.Data.Entity.EntityState.Modified;
+                            _db.Entry(pubEntry).State = System.Data.Entity.EntityState.Modified;
 
                             returnCount = Convert.ToInt32(returnAmount);
 
@@ -185,7 +184,7 @@ namespace QRSPortal2.Controllers
                                 pubEntry.Status = retStatus;
                                 pubEntry.ConfirmReturn = true;
                             }
-                            await cxt.SaveChangesAsync();
+                            await _db.SaveChangesAsync();
 
                             // Update Activity Logs
 
@@ -193,7 +192,7 @@ namespace QRSPortal2.Controllers
                             {
                                 AccountID = accountId,
                                 LogInformation = "",
-                                UserName = cxt.Users.FirstOrDefault(x => x.Email == loggedEmail).FullName,
+                                UserName = _db.Users.FirstOrDefault(x => x.Email == loggedEmail).FullName,
                                 EmailAddress = loggedEmail,
                                 PublicationDate = parsedPublicationDate,
                                 DistributionAmount = Convert.ToInt32(drawAmount),
@@ -210,7 +209,7 @@ namespace QRSPortal2.Controllers
                         {
                             return Json(new { success = false });
                         }
-                    }
+                   
                 }
 
                 return Json(new { success = false });
@@ -233,10 +232,28 @@ namespace QRSPortal2.Controllers
             {
                 var startDate = GetLastDistDate(id).ToString("yyyy-MM-dd");
                 var endDate = DateTime.Now.ToString("yyyy-MM-dd");
-                AccountController account = new AccountController();
-                account.InitializeController(this.Request.RequestContext);
+                _ac.InitializeController(this.Request.RequestContext);
 
-                return Json(new { success = await account.LoadTransactions(id, startDate, endDate)});
+                return Json(new { success = await _ac.LoadTransactions(id, startDate, endDate)});
+            }
+            catch (Exception ex)
+            {
+                Util.LogError(ex);
+                return Json(new { success = false });
+            }
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<JsonResult> GetLatestDraw(string id)
+        {
+            try
+            {
+                var startDate = DateTime.Now.AddDays(-60).ToString("yyyy-MM-dd");
+                var endDate = DateTime.Now.ToString("yyyy-MM-dd");
+                _ac.InitializeController(this.Request.RequestContext);
+
+                return Json(new { success = await _ac.UpdateDistributions(id, startDate, endDate) });
             }
             catch (Exception ex)
             {
@@ -317,11 +334,8 @@ namespace QRSPortal2.Controllers
 
             try
             {
-                using (ApplicationDbContext dc = new ApplicationDbContext())
-                {
-                    var v = dc.CircProTranx.Where(a => a.AccountID == accountID).FirstOrDefault();
-                    return v != null;
-                }
+                var v = _db.CircProTranx.Where(a => a.AccountID == accountID).FirstOrDefault();
+                return v != null;
             }
             catch (Exception ex)
             {
@@ -337,11 +351,8 @@ namespace QRSPortal2.Controllers
 
             try
             {
-                using (ApplicationDbContext dc = new ApplicationDbContext())
-                {
-                    var v = dc.CircProTranx.Where(a => a.AccountID == accountID).OrderByDescending(x => x.PublicationDate).FirstOrDefault().PublicationDate;
-                    return v.AddDays(1);
-                }
+                var v = _db.CircProTranx.Where(a => a.AccountID == accountID).OrderByDescending(x => x.PublicationDate).FirstOrDefault().PublicationDate;
+                return v.AddDays(1);
             }
             catch (Exception ex)
             {

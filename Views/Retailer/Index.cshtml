@@ -3,6 +3,9 @@
 @{
     ViewBag.Title = "All Agents";
 }
+<style>
+    .dataTables_filter label{ display: block; }
+</style>
 <div id="loadingScreen">
     <!-- Loading screen content goes here -->
     <div class="loader"></div>
@@ -123,16 +126,24 @@
 
         console.log($('[name=error]').val())
         $('.dtRetailers').DataTable({
+            fixedHeader: true,
             order: [[0, 'desc']],
             pageLength: 15,
-            "lengthChange": false,
+            lengthChange: false,
             responsive: true,
+            dom: "<'row'<'col-sm-6'f>>" + // Place the search box in its own row and make it wider
+                 "<'row'<'col-sm-12'tr>>" + // Display the table in its own row
+                 "<'row'<'col-sm-5'i><'col-sm-7'p>>",
             columnDefs: [
                 { responsivePriority: 1, targets: 0 }, // Account
                 { responsivePriority: 2, targets: 2 }, // Name
                 { responsivePriority: 3, targets: 3 }, // Company
                 //{ responsivePriority: 3, targets: 8 }  // Action
-            ]
+            ],
+            initComplete: function () {
+                // Add a class to the search label
+                $('.dataTables_filter label').addClass('form-label');                                                                                                                                                                                                                                                                                                       
+            }
 
         });
 

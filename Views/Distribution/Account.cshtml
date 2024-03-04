@@ -3,7 +3,11 @@
 @{
     ViewBag.Title = "Account";
 }
-
+    <style>
+        .dataTables_filter label {
+            display: block;
+        }
+    </style>
 <section class="section">
     <div class="row">
         <div class="col-lg-12">
@@ -15,10 +19,16 @@
                         <h5 class="card-title mb-0">Account: @ViewData["AccountId"]</h5>
                         @*<button type="button" class="btn btn-primary btn-sm">Get Latest</button>*@
                         <button type="button" class="btn btn-success btn-sm" name="getLatest" id="getLatest"><i class="bi bi-box-arrow-in-down"></i></button>
+                        <button type="button" class="btn btn-info btn-sm" name="getLatestDraw" id="getLatestDraw"><i class="bi bi-box-arrow-in-down"></i></button>
                     </div>
                     <div class="row small mb-3">
                         @*<div class="col-lg-3 col-md-4 label">Delivery Address</div>*@
-                        <div class="col-lg-9 col-md-8">@ViewData["Company"]<br>@ViewData["Address"]<br>@ViewData["Retailer"] </div>
+                        <div class="col-lg-9 col-md-8">
+                            @ViewData["Company"]<br>@ViewData["Address"]<br>@ViewData["Retailer"]
+                        <span class="visually-hidden"id="moreDetails" name="moreDetails">
+                            <br>@ViewData["Email"]<br> @ViewData["PHone"]
+                        </span>
+                        </div>
                     </div>
 
 
@@ -132,6 +142,7 @@
         $("#confirmAmount").hide();
     } else {
         // Show user-specific content
+        $("#moreDetails").removeClass('visually-hidden');
         $("#confirmAmount").show();
         $("#confirmAmount").prop("required", true);
         $("#returnAmount").prop("readonly", true);
@@ -142,7 +153,11 @@
         location.reload();
     }
     var hideColumn = (userRole == "Retailer") ? true : false;
+    var btnText = (userRole == "Retailer") ? 'Update Returns' : 'Confirm Returns';
+    $('#updateBtn').html(btnText);
+
     $(document).ready(function () {
+
         $('a[data-bs-toggle="modal"]').click(function () {
 
             $('#historyData').hide();
@@ -249,6 +264,7 @@
 
 
         $('.dtDistributions').DataTable({
+            fixedHeader: true,
             lengthChange: false,
             ordering: false,
             pageLength: 30,
@@ -259,6 +275,9 @@
                     //searchable: false
                 }
             ],
+            dom: "<'row'<'col-sm-12'f>>" + // Place the search box in its own row and make it wider
+                 "<'row'<'col-sm-12'tr>>" + // Display the table in its own row
+                 "<'row'<'col-sm-5'i><'col-sm-7'p>>",
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
                 // Remove the formatting to get integer data for summation
@@ -280,7 +299,11 @@
                     'Avg. Returns: ' + avg.toFixed(2);
                 
             },
-
+            initComplete: function () {
+                // Add a class to the search label
+                $('.dataTables_filter label').addClass('form-label');                                                                                                                                                                                                                                                                                                       
+            }
+            
         });
 
         $('[name=getLatest]').click(function () {
@@ -301,6 +324,46 @@
                         swal({
                             title: "Success!",
                             text: "Latest information has been pulled!",
+                            type: "success",
+                            dangerMode: false
+                        });
+
+                        setTimeout(
+                            ReloadPage
+                            , 2500);
+                    } else {
+                       swal({
+                            title: "Error!",
+                            text: "Something went wrong| Please try again later!",
+                            type: "warning",
+                            dangerMode: false
+                        });
+                    }
+                        
+                       
+                    }
+                });
+
+        });
+
+        $('[name=getLatestDraw]').click(function () {
+            var spinner = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
+            $('[name=getLatestDraw]').html(spinner);
+            $('[name=getLatestDraw]').attr('disabled', true);
+
+            $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("getlatestdraw", "distribution")',
+                    dataType: 'json',
+                    data: { id: $('#accountId').val() },
+                success: function (response) {
+
+                     if (response.success) {
+                       console.log(response.success);
+
+                        swal({
+                            title: "Success!",
+                            text: "Distribition numbers updated!",
                             type: "success",
                             dangerMode: false
                         });

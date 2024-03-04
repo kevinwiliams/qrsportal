@@ -55,8 +55,12 @@ namespace QRSPortal2.Controllers
                     }
                 }
 
+                if (User.IsInRole("Supervisor"))
+                {
+                    return RedirectToAction("index", "retailer");
+                }
 
-                if (User.IsInRole("Supervisor") || User.IsInRole("Retailer"))
+                if (User.IsInRole("Retailer"))
                 {
                     try
                     {
