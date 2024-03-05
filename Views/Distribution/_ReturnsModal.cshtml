@@ -8,13 +8,12 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="returnDataModalLabel">Published Date: <span id="pubDateModal"></span></h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close btn-lg" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="returnForm" name="returnForm" role="form" method="POST" class="g-3 needs-validation" data-request-url="@Url.Action("updatereturns","distribution")">
-                    <div class="form-group m-2">
+                    <div class="form-group small m-2">
+                        Draw: <span class="showDrawCnt"></span>  | <a id="disputeLlink" class="" href="#">Dispute</a>
                         @*<label for="publicationDate">Publication Date: <span id="pubDateModal"></span></label>*@
                         <input type="hidden" class="form-control" id="publicationDate" name="publicationDate">
                         <input type="hidden" class="form-control" id="drawAmount" name="drawAmount">
@@ -48,12 +47,15 @@
                         <input type="hidden" class="form-control" id="updatedAmount" name="updatedAmount">
 
                         <p class="small text-secondary" id="historyData" name="historyData">
-                                Updated: <span id="lastUpdate"></span><br>
-                                User: <span id="lastUser"></span><br>
-                                Return: <span id="lastRet"></span>
-                            </p>
-                        <a id="historyLink" class="small" href="#">Show History</a>
+                            Updated: <span id="lastUpdate"></span><br>
+                            User: <span id="lastUser"></span><br>
+                            Return: <span id="lastRet"></span>
+                        </p>
+                        
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <a id="historyLink" class="small" href="#">Show History</a>
                 </div>
             </div>
         </div>

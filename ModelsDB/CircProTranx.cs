@@ -36,6 +36,8 @@ namespace QRSPortal2.ModelsDB
         public string Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }
+        public Nullable<bool> IsDisputed { get; set; }
+
         [ForeignKey("UserID")]
         public CircproUsers CircproUser { get; set; }
     }

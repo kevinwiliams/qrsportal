@@ -39,6 +39,7 @@ namespace QRSPortal2.ModelsDB
         public Nullable<int> AddressID { get; set; }
         public System.DateTime CreatedAt { get; set; }
         public Nullable<System.DateTime> LastLogin { get; set; }
+        public bool NotifyEmail { get; set; }
 
         //Navigation properties
         [ForeignKey("UserID")]
