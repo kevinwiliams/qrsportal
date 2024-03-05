@@ -3,11 +3,11 @@
 @{
     ViewBag.Title = "Account";
 }
-    <style>
-        .dataTables_filter label {
-            display: block;
-        }
-    </style>
+<style>
+    .dataTables_filter label {
+        display: block;
+    }
+</style>
 <section class="section">
     <div class="row">
         <div class="col-lg-12">
@@ -25,9 +25,9 @@
                         @*<div class="col-lg-3 col-md-4 label">Delivery Address</div>*@
                         <div class="col-lg-9 col-md-8">
                             @ViewData["Company"]<br>@ViewData["Address"]<br>@ViewData["Retailer"]
-                        <span class="visually-hidden"id="moreDetails" name="moreDetails">
-                            <br>@ViewData["Email"]<br> @ViewData["PHone"]
-                        </span>
+                            <span class="visually-hidden" id="moreDetails" name="moreDetails">
+                                <br>@ViewData["Email"]<br> @ViewData["PHone"]
+                            </span>
                         </div>
                     </div>
 
@@ -118,9 +118,12 @@
         </div>
     </div>
 </section>
-<!-- Delivery Modal -->
+<!-- Returns Modal -->
 @{Html.RenderPartial("_ReturnsModal"); }
-<!-- end: Delivery Modal -->
+<!-- end: Returns Modal -->
+<!-- Dispute Modal -->
+@{Html.RenderPartial("_DisputeModal"); }
+<!-- end: Dispute Modal -->
 
 
 @Scripts.Render("~/bundles/jquery")
@@ -168,6 +171,9 @@
             var confirmAmt = $(this).closest('tr').find('input#item_ConfirmedAmount').val();
             //console.log('returnAmt', returnAmt);
             publicationDate = $(this).find(':first-child').val();
+            if (!publicationDate) {
+                publicationDate = $('#publicationDate').val();
+            }
             //console.log('pub: '+ publicationDate);
             $('#publicationDate').val(publicationDate);
             $('#pubDateModal').html( $('#publicationDate').val());
@@ -201,6 +207,7 @@
             // Concatenate day, month, and year in the desired format
             var formattedDate = dayOfWeek + ", " + dayOfMonth + "-" + month + "-" + year;
             $('#pubDateModal').html(formattedDate);
+            $('#disputeDateModal').html(formattedDate);
 
         });
 
@@ -251,7 +258,7 @@
                         setTimeout(
                             ReloadPage
                             , 2500);
-                        
+
                         // Clear the modal fields
                         $('#publicationDate').val('');
                         $('#returnAmount').val('');
@@ -299,13 +306,13 @@
                 // Update the footer
                 api.column(2).footer().innerHTML =
                     'Avg. Returns: ' + avg.toFixed(2);
-                
+
             },
             initComplete: function () {
                 // Add a class to the search label
-                $('.dataTables_filter label').addClass('form-label');                                                                                                                                                                                                                                                                                                       
+                $('.dataTables_filter label').addClass('form-label');
             }
-            
+
         });
 
         $('[name=getLatest]').click(function () {
@@ -341,8 +348,8 @@
                             dangerMode: false
                         });
                     }
-                        
-                       
+
+
                     }
                 });
 
@@ -381,8 +388,8 @@
                             dangerMode: false
                         });
                     }
-                        
-                       
+
+
                     }
                 });
 

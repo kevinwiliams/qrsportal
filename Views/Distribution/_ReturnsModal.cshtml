@@ -7,13 +7,13 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="returnDataModalLabel">Published Date: <span id="pubDateModal"></span></h5>
+                <h5 class="modal-title" id="returnDataModalLabel">Published Date: <span id="disputeDateModal"></span></h5>
                 <button type="button" class="btn-close btn-lg" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="returnForm" name="returnForm" role="form" method="POST" class="g-3 needs-validation" data-request-url="@Url.Action("updatereturns","distribution")">
                     <div class="form-group small m-2">
-                        Draw: <span class="showDrawCnt"></span>  | <a id="disputeLlink" class="" href="#">Dispute</a>
+                        Draw: <span class="showDrawCnt"></span>  | <a id="disputeLlink" class="" href="#" data-bs-target="#disputeDrawModal" data-bs-toggle="modal" data-bs-dismiss="modal">Dispute</a>
                         @*<label for="publicationDate">Publication Date: <span id="pubDateModal"></span></label>*@
                         <input type="hidden" class="form-control" id="publicationDate" name="publicationDate">
                         <input type="hidden" class="form-control" id="drawAmount" name="drawAmount">
@@ -38,7 +38,7 @@
                             I confirm this amount entered by me to be true and accurate.
                         </label>
                     </div>
-                    <button type="submit" class="btn btn-primary m-2 mb-0" id="updateBtn" name="updateBtn">Update</button>
+                    <button type="submit" class="btn btn-sm btn-primary m-2 mb-0" id="updateBtn" name="updateBtn">Update</button>
                 </form>
                 <div class="row mt-4">
                     <div class="col-12 align-content-center">
