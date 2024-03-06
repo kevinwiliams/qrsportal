@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using Newtonsoft.Json;
 using QRSPortal2.Models;
 using QRSPortal2.ModelsDB;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -27,29 +29,25 @@ namespace QRSPortal2.Controllers
         {
             try
             {
+                var sql = @"SELECT 
+                                [AccountID]
+                                ,[DistributionTypeID]
+                                ,[PublicationDate]
+                                ,[DistributionAmount]
+                                ,[ReturnDate]
+                                ,[ReturnAmount]
+                                ,[ConfirmDate]
+                                ,[ConfirmedAmount]
+                                ,[ConfirmReturn]
+                                ,[Status]
+                            FROM [dbo].[CircProTransactions]";
 
-                using (var cxt = new ApplicationDbContext())
-                {
+                var result = _db.Database.SqlQuery<DistributionData>(sql).ToList();
+                //TODO:Loop to trim address field
 
-                    var sql = @"SELECT 
-                                  [AccountID]
-                                  ,[DistributionTypeID]
-                                  ,[PublicationDate]
-                                  ,[DistributionAmount]
-                                  ,[ReturnDate]
-                                  ,[ReturnAmount]
-                                  ,[ConfirmDate]
-                                  ,[ConfirmedAmount]
-                                  ,[ConfirmReturn]
-                                  ,[Status]
-                              FROM [dbo].[CircProTransactions]";
+                return View(result);
 
-                    var result = cxt.Database.SqlQuery<DistributionData>(sql).ToList();
-                    //TODO:Loop to trim address field
-
-                    return View(result);
-
-                }
+                
             }
             catch (Exception ex)
             {
@@ -160,55 +158,55 @@ namespace QRSPortal2.Controllers
                 if (DateTime.TryParse(publicationDate, out parsedPublicationDate))
                 {
                     
-                        var pubEntry = _db.CircProTranx.FirstOrDefault(a => a.AccountID == accountId && a.PublicationDate == parsedPublicationDate);
-                        if (pubEntry != null)
+                    var pubEntry = _db.CircProTranx.FirstOrDefault(a => a.AccountID == accountId && a.PublicationDate == parsedPublicationDate);
+                    if (pubEntry != null)
+                    {
+                        _db.Entry(pubEntry).State = System.Data.Entity.EntityState.Modified;
+
+                        returnCount = Convert.ToInt32(returnAmount);
+
+                        pubEntry.ReturnAmount = returnCount;
+                        pubEntry.Status = retStatus;
+                        pubEntry.ReturnDate = DateTime.Now;
+                        pubEntry.UpdatedAt = DateTime.Now;
+
+                        if (userRole != "Retailer")
                         {
-                            _db.Entry(pubEntry).State = System.Data.Entity.EntityState.Modified;
+                            returnCount = Convert.ToInt32(confirmAmount);
 
-                            returnCount = Convert.ToInt32(returnAmount);
+                            retStatus = "Closed";
 
-                            pubEntry.ReturnAmount = returnCount;
-                            pubEntry.Status = retStatus;
-                            pubEntry.ReturnDate = DateTime.Now;
+                            pubEntry.ConfirmedAmount = returnCount;
+                            pubEntry.ConfirmDate = DateTime.Now;
                             pubEntry.UpdatedAt = DateTime.Now;
-
-                            if (userRole != "Retailer")
-                            {
-                                returnCount = Convert.ToInt32(confirmAmount);
-
-                                retStatus = "Closed";
-
-                                pubEntry.ConfirmedAmount = returnCount;
-                                pubEntry.ConfirmDate = DateTime.Now;
-                                pubEntry.UpdatedAt = DateTime.Now;
-                                pubEntry.Status = retStatus;
-                                pubEntry.ConfirmReturn = true;
-                            }
-                            await _db.SaveChangesAsync();
-
-                            // Update Activity Logs
-
-                            QRSActivityLog qRSActivityLog = new QRSActivityLog 
-                            {
-                                AccountID = accountId,
-                                LogInformation = "",
-                                UserName = _db.Users.FirstOrDefault(x => x.Email == loggedEmail).FullName,
-                                EmailAddress = loggedEmail,
-                                PublicationDate = parsedPublicationDate,
-                                DistributionAmount = Convert.ToInt32(drawAmount),
-                                ReturnAmount = returnCount,
-                                Status = retStatus
-                            };
-
-                            Util.LogUserActivity(qRSActivityLog);
-
-                            return Json(new { success = true });
-
+                            pubEntry.Status = retStatus;
+                            pubEntry.ConfirmReturn = true;
                         }
-                        else
+                        await _db.SaveChangesAsync();
+
+                        // Update Activity Logs
+
+                        QRSActivityLog qRSActivityLog = new QRSActivityLog 
                         {
-                            return Json(new { success = false });
-                        }
+                            AccountID = accountId,
+                            LogInformation = "",
+                            UserName = _db.Users.FirstOrDefault(x => x.Email == loggedEmail).FullName,
+                            EmailAddress = loggedEmail,
+                            PublicationDate = parsedPublicationDate,
+                            DistributionAmount = Convert.ToInt32(drawAmount),
+                            ReturnAmount = returnCount,
+                            Status = retStatus
+                        };
+
+                        Util.LogUserActivity(qRSActivityLog);
+
+                        return Json(new { success = true });
+
+                    }
+                    else
+                    {
+                        return Json(new { success = false });
+                    }
                    
                 }
 
@@ -221,6 +219,112 @@ namespace QRSPortal2.Controllers
                 return Json(new { success = false });
             }
            
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<JsonResult> SubmitDispute(FormCollection frm)
+        {
+
+            try
+            {
+                // Access form data using the collection parameter
+                string accountId = frm["accountId"];
+                string returnAmount = frm["returnAmount"];
+                string drawAmount = frm["disputeDrawAmount"];
+                string disputeAmount = frm["disputeAmount"];
+                string publicationDate = frm["disputePublicationDate"];
+                string loggedEmail = frm["loggedEmail"];
+                string userRole = frm["userRole"];
+                DateTime parsedPublicationDate;
+                
+                DistributionData distributionData = new DistributionData();
+                _ac.InitializeController(this.Request.RequestContext);
+
+
+                if (DateTime.TryParse(publicationDate, out parsedPublicationDate))
+                {
+
+                    var pubEntry = _db.CircProTranx.FirstOrDefault(a => a.AccountID == accountId && a.PublicationDate == parsedPublicationDate);
+                    if (pubEntry != null) {
+
+                        //Flag entry in the table
+                        _db.Entry(pubEntry).State = System.Data.Entity.EntityState.Modified;
+                        pubEntry.IsDisputed = true;
+                        await _db.SaveChangesAsync();
+
+
+                        var UserManager = Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
+                        //Load Email Data
+                        var sql = @"SELECT 
+                                T.[AccountID]
+                                ,T.[DistributionTypeID]
+                                ,T.[PublicationDate]
+                                ,T.[DistributionAmount]
+                                ,T.[ReturnDate]
+                                ,T.[ReturnAmount]
+                                ,T.[ConfirmDate]
+                                ,T.[ConfirmedAmount]
+                                ,T.[ConfirmReturn]
+                                ,T.[Status]
+	                            ,CONCAT(U.FirstName, ' ', U.LastName) AS RetailerName,
+                                U.EmailAddress,
+                                U.Company,
+                                NULLIF(
+                                    COALESCE(LTRIM(RTRIM(A.AddressLine1)) + ', ', '') + 
+                                    COALESCE(LTRIM(RTRIM(A.AddressLine2)) + ', ', '') + 
+                                    COALESCE(LTRIM(RTRIM(A.CityTown)), ''), 
+                                    ''
+                                ) AS RetailerAddress,
+                                U.PhoneNumber,
+                                U.CellNumber
+                            FROM [dbo].[CircProTransactions] T
+                            JOIN [dbo].[CircproUsers] U ON U.AccountID = T.AccountID
+                            JOIN [dbo].[CircProAddresses] A ON U.UserID = A.UserID
+                            WHERE T.[AccountID] = @AccountID AND T.[PublicationDate] = @PublicationDate
+                        ORDER BY T.[PublicationDate] DESC";
+                        var accountID = new SqlParameter("@AccountID", accountId);
+                        var pubDate = new SqlParameter("@PublicationDate", parsedPublicationDate);
+                        var result = await _db.Database.SqlQuery<DistributionData>(sql, accountID, pubDate).FirstOrDefaultAsync();
+                        distributionData = result;
+                        distributionData.DisputeAmount = Convert.ToInt32(disputeAmount);
+
+                        //set up email
+                        string subject = "Draw Dispute - " + accountId;
+                        string body = RenderViewToString(this.ControllerContext, "~/Views/Emails/DrawDispute.cshtml", distributionData);
+                        await UserManager.SendEmailAsync(User.Identity.GetUserId(), subject, body);
+
+                        // Update Activity Logs
+                        //QRSActivityLog qRSActivityLog = new QRSActivityLog
+                        //{
+                        //    AccountID = accountId,
+                        //    LogInformation = "Dispute",
+                        //    UserName = _db.Users.FirstOrDefault(x => x.Email == loggedEmail).FullName,
+                        //    EmailAddress = loggedEmail,
+                        //    PublicationDate = parsedPublicationDate,
+                        //    DistributionAmount = Convert.ToInt32(drawAmount),
+                        //    ReturnAmount = returnCount,
+                        //    Status = retStatus
+                        //};
+
+                        //Util.LogUserActivity(qRSActivityLog);
+
+                        return Json(new { success = true });
+
+                    }
+                    
+
+                }
+
+                return Json(new { success = false });
+            }
+            catch (Exception ex)
+            {
+
+                Util.LogError(ex);
+                return Json(new { success = false });
+            }
+
         }
 
 
@@ -325,6 +429,27 @@ namespace QRSPortal2.Controllers
             catch
             {
                 return View();
+            }
+        }
+
+        public static string RenderViewToString<TModel>(ControllerContext controllerContext, string viewName, TModel model)
+        {
+            ViewEngineResult viewEngineResult = ViewEngines.Engines.FindView(controllerContext, viewName, null);
+            if (viewEngineResult.View == null)
+            {
+                throw new Exception("Could not find the View file. Searched locations:\r\n" + viewEngineResult.SearchedLocations);
+            }
+            else
+            {
+                IView view = viewEngineResult.View;
+
+                using (var stringWriter = new StringWriter())
+                {
+                    var viewContext = new ViewContext(controllerContext, view, new ViewDataDictionary<TModel>(model), new TempDataDictionary(), stringWriter);
+                    view.Render(viewContext, stringWriter);
+
+                    return stringWriter.ToString();
+                }
             }
         }
 

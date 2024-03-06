@@ -1,4 +1,4 @@
-﻿@model QRSPortal2.Models.ForgotPasswordViewModel
+﻿@model QRSPortal2.Models.DistributionData
 @{
     Layout = "";
 }
@@ -101,47 +101,45 @@
                         <!-- Email Header : BEGIN -->
                         <table cellspacing="0" cellpadding="0" border="0" align="center" width="100%" style="max-width: 600px;">
                             <tr>
-                                <td style="padding: 20px 0; text-align: center"><img src="https://static.ew.jam.navigacloud.com/wp-content/uploads/sites/2/2022/12/28221954/logo.png" width="200" height="50" alt="The Jamaica Observer Limited" border="0"></td>
+                                <td style="padding: 20px 0; text-align: center"><img src="https://static.ew.jam.navigacloud.com/wp-content/uploads/sites/2/2022/12/28221954/logo.png" width="300"  alt="The Jamaica Observer Limited" border="0"></td>
                             </tr>
                         </table>
                         <!-- Email Header : END -->
                         <!-- Email Body : BEGIN -->
                         <table cellspacing="0" cellpadding="0" border="0" align="center" bgcolor="#ffffff" width="100%" style="max-width: 600px;">
 
-                            <!-- Hero Image, Flush : BEGIN -->
-                            <tr>
-                                <td class="full-width-image" align="center"><img src="https://static.ew.jam.navigacloud.com/wp-content/uploads/sites/2/2022/12/28221953/subsc_header.png" width="600" alt="The Jamaica Observer Subscription Service" border="0" style="width: 100%; max-width: 600px; height: auto;"></td>
-                            </tr>
-                            <!-- Hero Image, Flush : END -->
+                            
                             <!-- 1 Column Text : BEGIN -->
                             <tr>
                                 <td>
                                     <table cellspacing="0" cellpadding="0" border="0" width="100%">
                                         <tr>
                                             <td style="padding: 40px; font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; line-height: 20px; color: #555555;">
-                                                <p>
-                                                    We have received your password reset request for our subscription service.
-                                                </p>
+                                                <h3>
+                                                    Disputed filed for @Model.AccountID
+                                                </h3>
 
-                                                <p>
-                                                    Please reset your password by clicking the button below
-
-
-
-                                                    <br>
-
-                                                    <!-- Button : Begin -->
-
-                                                </p>
+                                                
 
                                                 <table cellspacing="0" cellpadding="0" border="0" align="center" style="margin: auto;">
 
                                                     <tr>
 
                                                         <td style="border-radius: 3px; background: #222222; text-align: center;" class="button-td">
-                                                            <a href="@(Model.CallBackUrl)" style="background: #222222; border: 15px solid #222222; padding: 0 10px;color: #ffffff; font-family: sans-serif; font-size: 13px; line-height: 1.1; text-align: center; text-decoration: none; display: block; border-radius: 3px; font-weight: bold;" class="button-a">
-                                                                <!--[if mso]>&nbsp;&nbsp;&nbsp;&nbsp;<![endif]-->Reset Password<!--[if mso]>&nbsp;&nbsp;&nbsp;&nbsp;<![endif]-->
-                                                            </a>
+                                                            <p>
+                                                                Name: @Model.RetailerName<br />
+                                                                Company: @Model.Company <br />
+                                                                Address: @Model.RetailerAddress<br />
+                                                                Tel: @Model.PhoneNumber<br />
+                                                                Cell:@Model.CellNumber<br /><br />
+                                                            </p>
+                                                            <p>
+                                                                <b>Distribtion Amount: </b> @Model.DistributionAmount<br /><br />
+                                                            <b>Dispute Amount:</b> @Model.DisputeAmount
+
+
+                                                                <br>
+                                                            </p>
                                                         </td>
                                                     </tr>
                                                 </table>

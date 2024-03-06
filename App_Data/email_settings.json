@@ -9,7 +9,7 @@
   "email_port_number": "587",
   "bcc_closed": "williamskt@jamaicaobserver.com, iamteddikev@gmail.com",
   //"bcc_closed": "circulation@jamaicaobserver.com, williamskt@jamaicaobserver.com, morgano@jamaicaobserver.com, reids@jamaicaobserver.com",
-  "bcc_epaper": "williamskt@jamaicaobserver.com",
-  "feedback_email": "williamskt@jamaicaobserver.com"
+  "bcc_notify": "williamskt@jamaicaobserver.com",
+  "dispute_email": "williamskt@jamaicaobserver.com"
 
 }

@@ -26,7 +26,7 @@
                         <div class="col-lg-9 col-md-8">
                             @ViewData["Company"]<br>@ViewData["Address"]<br>@ViewData["Retailer"]
                             <span class="visually-hidden" id="moreDetails" name="moreDetails">
-                                <br>@ViewData["Email"]<br> @ViewData["PHone"]
+                                <br>@ViewData["Email"]<br> @ViewData["Phone"]
                             </span>
                         </div>
                     </div>
@@ -266,6 +266,51 @@
                         $('#confirmReturn').prop('checked', false);
                         // Close the modal
                         $('#returnDataModal').modal('hide');
+                    }
+                });
+            }
+        });
+
+        $('#disputeForm').submit(function (e) {
+            e.preventDefault();
+
+            var drawAmount = parseInt($('#drawAmount').val());
+            var returnAmount = parseInt($('#returnAmount').val());
+            var confirmAmount = parseInt($('#confirmAmount').val());
+
+            let formData = $("[name=disputeForm]").valid();
+            let Url = $("[name=disputeForm]").data("request-url");
+            if (formData) {
+                //Serialize the form datas.   
+                var returnsData = $("[name=disputeForm] :input").serialize();
+                //console.log(returnsData);
+                $('#sendBtn').attr('disabled', true);
+                $('#sendBtn').html('Loading..');
+
+                $.ajax({
+                    type: "POST",
+                    url: Url,
+                    dataType: 'json',
+                    data: returnsData,
+                    success: function (result) {
+                        console.log(result);
+
+                        swal({
+                            title: "Success!",
+                            text: "Your dispute has been successfully submitted!",
+                            type: "success",
+                            dangerMode: false
+                        });
+
+                        setTimeout(
+                            ReloadPage
+                            , 2500);
+
+                        // Clear the modal fields
+                        $('#disputeAmount').val('');
+                       
+                        // Close the modal
+                        $('#disputeDrawModal').modal('hide');
                     }
                 });
             }

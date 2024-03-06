@@ -36,7 +36,7 @@ namespace QRSPortal2
                     "~/Content/bootstrap-icons/bootstrap-icons.css",
                     "~/Content/boxicons/css/boxicons.min.css",
                     "~/Content/apexcharts/apexcharts.css",
-                    "~/Content/simple-datatables/style.css"));
+                    "~/Content/simple-datatables/style.css?v=1.1"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",

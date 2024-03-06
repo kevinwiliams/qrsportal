@@ -27,6 +27,7 @@ namespace QRSPortal2.Models
         public DateTime ConfirmDate { get; set; }
         [Display(Name = "C")]
         public int ConfirmedAmount { get; set; }
+        public int DisputeAmount { get; set; }
         public bool ConfirmReturn { get; set; }
         public string Status { get; set; }
 

@@ -40,7 +40,9 @@ namespace QRSPortal2
                     password = (string)settings["email_password"],
                     domain = (string)settings["email_address_domain"],
                     portNumber = (string)settings["email_port_number"],
-                    bccClosed = (string)settings["bcc_closed"];
+                    bccClosed = (string)settings["bcc_closed"],
+                    bccNotify = (string)settings["bcc_notify"],
+                    dispute = (string)settings["dispute_email"];
 
 
                 int port;
@@ -55,7 +57,13 @@ namespace QRSPortal2
                 var newMsg = new MailMessage();
                 var mailSubject = msg.Subject;
                 newMsg.To.Add(msg.Destination);
-                newMsg.Bcc.Add(bccClosed);
+
+                if (mailSubject.Contains("Returns") && mailSubject.Contains("Confirmed"))
+                    newMsg.Bcc.Add(bccClosed);
+
+                if (mailSubject.Contains("Dispute"))
+                    newMsg.Bcc.Add(dispute);
+
 
                 newMsg.From = new MailAddress(sentFrom, displayName);
                 newMsg.Subject = mailSubject;

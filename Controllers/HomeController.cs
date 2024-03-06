@@ -64,16 +64,15 @@ namespace QRSPortal2.Controllers
                 {
                     try
                     {
-                        using (ApplicationDbContext dc = new ApplicationDbContext())
-                        {
-                            var accountId = dc.CircproUsers.Where(a => a.EmailAddress == User.Identity.Name).FirstOrDefault();
+                      
+                        var accountId = _db.CircproUsers.Where(a => a.EmailAddress == User.Identity.Name).FirstOrDefault();
 
-                            if (accountId != null)
-                            {
-                                ViewData["UserName"] = _db.Users.FirstOrDefault(x => x.Email == User.Identity.Name).FullName;
-                                return RedirectToAction("account", "distribution", new { id = accountId.AccountID });
-                            }
+                        if (accountId != null)
+                        {
+                            ViewData["UserName"] = _db.Users.FirstOrDefault(x => x.Email == User.Identity.Name).FullName;
+                            return RedirectToAction("account", "distribution", new { id = accountId.AccountID });
                         }
+                        
                     }
                     catch (Exception ex)
                     {
@@ -95,27 +94,24 @@ namespace QRSPortal2.Controllers
             {
                 using (ApplicationDbContext db = new ApplicationDbContext())
                 {
-                    using (var cxt = new ApplicationDbContext())
+
+                    var sql = @"SELECT MONTH(PublicationDate) AS PeriodNumber,
+                                        SUM(DistributionAmount) AS TotalDistributionAmount,
+                                        SUM(ReturnAmount) AS TotalReturnAmount,
+                                        SUM(ConfirmedAmount) AS TotalConfirmedAmount
+                                FROM [dbo].[CircProTransactions]
+                                GROUP BY MONTH(PublicationDate)
+                                ORDER BY PeriodNumber";
+
+                    var result = _db.Database.SqlQuery<TransactionData>(sql).ToList();
+                    //TODO:Loop to trim address field
+                    foreach (var item in result)
                     {
-
-                        var sql = @"SELECT MONTH(PublicationDate) AS PeriodNumber,
-                                           SUM(DistributionAmount) AS TotalDistributionAmount,
-                                           SUM(ReturnAmount) AS TotalReturnAmount,
-                                           SUM(ConfirmedAmount) AS TotalConfirmedAmount
-                                    FROM [dbo].[CircProTransactions]
-                                    GROUP BY MONTH(PublicationDate)
-                                    ORDER BY PeriodNumber";
-
-                        var result = cxt.Database.SqlQuery<TransactionData>(sql).ToList();
-                        //TODO:Loop to trim address field
-                        foreach (var item in result)
-                        {
-                            item.PeriodText = "Month " + item.PeriodNumber;
-                        }
-
-                        return result;
-
+                        item.PeriodText = "Month " + item.PeriodNumber;
                     }
+
+                    return result;
+
                 }
             }
             catch (Exception ex)
@@ -155,28 +151,25 @@ namespace QRSPortal2.Controllers
             {
                 using (ApplicationDbContext db = new ApplicationDbContext())
                 {
-                    using (var cxt = new ApplicationDbContext())
+
+                    var sql = @"SELECT DATEPART(week, PublicationDate) AS PeriodNumber,
+                                        SUM(DistributionAmount) AS TotalDistributionAmount,
+                                        SUM(ReturnAmount) AS TotalReturnAmount,
+                                        SUM(ConfirmedAmount) AS TotalConfirmedAmount
+                                FROM [dbo].[CircProTransactions]
+                                GROUP BY DATEPART(week, PublicationDate)
+                                ORDER BY PeriodNumber";
+
+                    var result = _db.Database.SqlQuery<TransactionData>(sql).ToList();
+
+                    foreach (var item in result)
                     {
-
-                        var sql = @"SELECT DATEPART(week, PublicationDate) AS PeriodNumber,
-                                            SUM(DistributionAmount) AS TotalDistributionAmount,
-                                            SUM(ReturnAmount) AS TotalReturnAmount,
-                                            SUM(ConfirmedAmount) AS TotalConfirmedAmount
-                                    FROM [dbo].[CircProTransactions]
-                                    GROUP BY DATEPART(week, PublicationDate)
-                                    ORDER BY PeriodNumber";
-
-                        var result = cxt.Database.SqlQuery<TransactionData>(sql).ToList();
-
-                        foreach (var item in result)
-                        {
-                            item.PeriodText = "Week " + item.PeriodNumber;
-                        }
-                        //TODO:Loop to trim address field
-
-                        return result;
-
+                        item.PeriodText = "Week " + item.PeriodNumber;
                     }
+                    //TODO:Loop to trim address field
+
+                    return result;
+                    
                 }
             }
             catch (Exception ex)

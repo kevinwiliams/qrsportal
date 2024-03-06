@@ -12,7 +12,7 @@
                 <button type="button" class="btn-close btn-lg" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="disputeForm" name="disputeForm" role="form" method="POST" class="g-3 needs-validation" data-request-url="@Url.Action("disputedraw","distribution")">
+                <form id="disputeForm" name="disputeForm" role="form" method="POST" class="g-3 needs-validation" data-request-url="@Url.Action("submitdispute","distribution")">
                     <div class="form-group m-2">
                         Draw: <span class="showDrawCnt"></span> 
                         @*<label for="publicationDate">Publication Date: <span id="pubDateModal"></span></label>*@
@@ -30,7 +30,7 @@
 
                     <div class="row p-2 mb-3">
                         <div class="col-sm-6">
-                            <button type="submit" class="btn btn-sm btn-primary m-2 mb-0" id="sendBtn" name="sendBtn">Send Dispute</button>
+                            <button type="submit" class="btn btn-sm btn-primary m-2 mb-0" id="sendBtn" name="sendBtn">Submit Dispute</button>
 
                         </div>
                     </div>
