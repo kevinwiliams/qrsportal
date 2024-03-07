@@ -21,6 +21,7 @@ using System.Web.Script.Serialization;
 using System.Globalization;
 using DeviceDetectorNET;
 using QRSPortal2.ModelsDB;
+using System.Net.Mail;
 
 namespace QRSPortal2
 {
@@ -857,6 +858,73 @@ namespace QRSPortal2
             return result;
         }
 
+        public static async Task<bool> SendMail(string emailTo, string subject, string body)
+        {
+            bool emailSent = false;
+
+            try
+            {
+                var jsonFile = File.ReadAllText(HttpContext.Current.Server.MapPath("~/App_Data/email_settings.json"));
+                var settings = JObject.Parse(jsonFile);
+                // Credentials
+                string userName = (string)settings["email_address_username"],
+                    sentFrom = (string)settings["email_address"],
+                    displayName = (string)settings["email_address_from"],
+                    pwd = (string)settings["email_password"],
+                    smtp_host = (string)settings["smtp_host"],
+                    ssl_enabled = (string)settings["ssl_enabled"],
+                    password = (string)settings["email_password"],
+                    domain = (string)settings["email_address_domain"],
+                    portNumber = (string)settings["email_port_number"],
+                    bccClosed = (string)settings["bcc_closed"],
+                    bccNotify = (string)settings["bcc_notify"],
+                    dispute = (string)settings["dispute_email"];
+
+
+                int port;
+
+                // Configure the client:
+                SmtpClient smtp = new SmtpClient();
+                smtp.Host = smtp_host;
+                smtp.Port = (int.TryParse(portNumber, out port) ? port : 25);
+                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                smtp.UseDefaultCredentials = true;
+
+                var newMsg = new MailMessage();
+                var mailSubject = subject;
+                newMsg.To.Add(emailTo);
+
+                if (mailSubject.Contains("Returns") && mailSubject.Contains("Confirmation"))
+                    newMsg.Bcc.Add(bccClosed);
+
+                if (mailSubject.Contains("Dispute"))
+                    newMsg.Bcc.Add(dispute);
+
+
+                newMsg.From = new MailAddress(sentFrom, displayName);
+                newMsg.Subject = mailSubject;
+                newMsg.Body = body;
+                newMsg.IsBodyHtml = true;
+
+                var credentials = new NetworkCredential(userName, pwd);
+                smtp.Credentials = credentials;
+                smtp.EnableSsl = bool.Parse(ssl_enabled);
+
+                // Send
+                await smtp.SendMailAsync(newMsg);
+
+                // Clear CCs 
+                newMsg.CC.Clear();
+                newMsg.Bcc.Clear();
+
+                return emailSent = true;
+            }
+            catch (Exception ex)
+            {
+                Util.LogError(ex);
+                return emailSent = false;
+            }
+        }
     }
 
     

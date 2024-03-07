@@ -75,7 +75,7 @@ namespace QRSPortal2.Controllers
 
 
                 // Get latest records
-                await GetLatest(id);
+                //await GetLatest(id);
 
                 var sql = @"SELECT 
                                 T.[AccountID]
@@ -154,10 +154,43 @@ namespace QRSPortal2.Controllers
                 int returnCount = 0;
                 string retStatus = "Open";
                 DateTime parsedPublicationDate;
+                DistributionData distributionData = new DistributionData();
+                string subject = "";
+                string body = "";
+
+               
 
                 if (DateTime.TryParse(publicationDate, out parsedPublicationDate))
                 {
-                    
+
+                    //Load Email Data
+                    var result = await (from t in _db.CircProTranx
+                                        join u in _db.CircproUsers on t.AccountID equals u.AccountID
+                                        join a in _db.CircProAddress on u.UserID equals a.UserID
+                                        where t.AccountID == accountId && t.PublicationDate == parsedPublicationDate
+                                        orderby t.PublicationDate descending
+                                        select new DistributionData
+                                        {
+                                            AccountID = t.AccountID,
+                                            DistributionTypeID = t.DistributionTypeID,
+                                            PublicationDate = t.PublicationDate,
+                                            DistributionAmount = t.DistributionAmount,
+                                            ReturnDate = (DateTime)t.ReturnDate,
+                                            ReturnAmount = (int)t.ReturnAmount,
+                                            ConfirmDate = (DateTime)t.ConfirmDate,
+                                            ConfirmedAmount = (int)t.ConfirmedAmount,
+                                            ConfirmReturn = (bool)t.ConfirmReturn,
+                                            Status = t.Status,
+                                            RetailerName = u.FirstName + " " + u.LastName,
+                                            EmailAddress = u.EmailAddress,
+                                            Company = u.Company,
+                                            RetailerAddress = (a.AddressLine1 ?? "") + ", " + (a.AddressLine2 ?? "") + ", " + (a.CityTown ?? ""),
+                                            PhoneNumber = u.PhoneNumber,
+                                            CellNumber = u.CellNumber
+                                        }).FirstOrDefaultAsync();
+
+                    distributionData = result;
+
                     var pubEntry = _db.CircProTranx.FirstOrDefault(a => a.AccountID == accountId && a.PublicationDate == parsedPublicationDate);
                     if (pubEntry != null)
                     {
@@ -169,6 +202,11 @@ namespace QRSPortal2.Controllers
                         pubEntry.Status = retStatus;
                         pubEntry.ReturnDate = DateTime.Now;
                         pubEntry.UpdatedAt = DateTime.Now;
+                        //load email variable
+                        distributionData.ReturnAmount = returnCount;
+                        subject = "QRS Returns Notification - " + accountId;
+                        body = RenderViewToString(this.ControllerContext, "~/Views/Emails/ConfirmReturnRetailer.cshtml", distributionData);
+
 
                         if (userRole != "Retailer")
                         {
@@ -181,8 +219,22 @@ namespace QRSPortal2.Controllers
                             pubEntry.UpdatedAt = DateTime.Now;
                             pubEntry.Status = retStatus;
                             pubEntry.ConfirmReturn = true;
+                            //load email variable
+                            distributionData.ConfirmedAmount = Convert.ToInt32(confirmAmount);
+                            subject = "QRS Returns Closed Confirmation - " + accountId;
+                            body = RenderViewToString(this.ControllerContext, "~/Views/Emails/ConfirmReturn.cshtml", distributionData);
+
                         }
+                        //update database
                         await _db.SaveChangesAsync();
+
+                        //set up email
+                        bool notifyRetailer = _db.CircproUsers.FirstOrDefault(x => x.AccountID == accountId).NotifyEmail;
+
+                        if (notifyRetailer || userRole != "Retailer")
+                        {
+                            bool emailSent = await Util.SendMail(User.Identity.Name, subject, body);
+                        }
 
                         // Update Activity Logs
 
@@ -239,8 +291,6 @@ namespace QRSPortal2.Controllers
                 DateTime parsedPublicationDate;
                 
                 DistributionData distributionData = new DistributionData();
-                _ac.InitializeController(this.Request.RequestContext);
-
 
                 if (DateTime.TryParse(publicationDate, out parsedPublicationDate))
                 {
@@ -253,8 +303,6 @@ namespace QRSPortal2.Controllers
                         pubEntry.IsDisputed = true;
                         await _db.SaveChangesAsync();
 
-
-                        var UserManager = Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
                         //Load Email Data
                         var sql = @"SELECT 
                                 T.[AccountID]
@@ -290,9 +338,9 @@ namespace QRSPortal2.Controllers
                         distributionData.DisputeAmount = Convert.ToInt32(disputeAmount);
 
                         //set up email
-                        string subject = "Draw Dispute - " + accountId;
+                        string subject = "QRS Draw Dispute - " + accountId;
                         string body = RenderViewToString(this.ControllerContext, "~/Views/Emails/DrawDispute.cshtml", distributionData);
-                        await UserManager.SendEmailAsync(User.Identity.GetUserId(), subject, body);
+                        bool emailSent = await Util.SendMail(User.Identity.Name, subject, body);
 
                         // Update Activity Logs
                         //QRSActivityLog qRSActivityLog = new QRSActivityLog
@@ -309,7 +357,10 @@ namespace QRSPortal2.Controllers
 
                         //Util.LogUserActivity(qRSActivityLog);
 
-                        return Json(new { success = true });
+                        if (emailSent)
+                            return Json(new { success = true });
+                        else
+                            return Json(new { success = false });
 
                     }
                     

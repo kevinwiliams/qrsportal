@@ -414,6 +414,7 @@
     <Content Include="site.webmanifest" />
     <Content Include="Views\Emails\ConfirmReturn.cshtml" />
     <Content Include="Views\Emails\DrawDispute.cshtml" />
+    <Content Include="Views\Emails\ConfirmReturnRetailer.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

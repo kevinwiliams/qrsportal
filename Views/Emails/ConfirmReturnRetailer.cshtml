@@ -11,7 +11,7 @@
     <!-- Forcing initial-scale shouldn't be necessary -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!-- Use the latest (edge) version of IE rendering engine -->
-    <title>Returns Confirmation</title>
+    <title>Returns Notification</title>
     <!-- The title tag shows in email notifications, like Android 4.4. -->
     <!-- Please use an inliner tool to convert all CSS to inline as inpage or external CSS is removed by email clients -->
     <!-- important in CSS is used to prevent the styles of currently inline CSS from overriding the ones mentioned in media queries when corresponding screen sizes are encountered -->
@@ -115,7 +115,7 @@
                                         <tr>
                                             <td style="padding: 40px; font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; line-height: 20px; color: #555555;">
                                                 <h3>
-                                                    Returns confirmed for Account: @Model.AccountID
+                                                    Returns submitted for Account: @Model.AccountID
                                                 </h3>
 
                                                 <table cellspacing="0" cellpadding="0" border="0" align="center" style="margin: auto;">
@@ -134,7 +134,6 @@
                                                                 <b>Publication Date: </b>@Model.PublicationDate.ToString("yyyy-MMM-dd") <br />
                                                                 <b>Distribtion Amount: </b> @Model.DistributionAmount<br /><br />
                                                                 <b>Returns Logged:</b> @Model.ReturnAmount<br /><br />
-                                                                <b>Returns Confirmed:</b> @Model.ConfirmedAmount
 
 
                                                                 <br>
