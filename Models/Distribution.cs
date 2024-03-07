@@ -30,13 +30,13 @@ namespace QRSPortal2.Models
         public int DisputeAmount { get; set; }
         public bool ConfirmReturn { get; set; }
         public string Status { get; set; }
-
         public string RetailerName { get; set; }
         public string Company { get; set; }
         public string RetailerAddress { get; set; }
         public string EmailAddress { get; set; }
         public string PhoneNumber { get; set; }
         public string CellNumber { get; set; }
+        public Nullable<bool> IsDisputed { get; set; }
     }
 
 

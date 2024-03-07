@@ -17,6 +17,7 @@
                         @*<label for="publicationDate">Publication Date: <span id="pubDateModal"></span></label>*@
                         <input type="hidden" class="form-control" id="publicationDate" name="publicationDate">
                         <input type="hidden" class="form-control" id="drawAmount" name="drawAmount">
+                        <input type="hidden" class="form-control" id="isDisputed" name="isDisputed">
                         <input type="hidden" class="form-control" id="accountId" name="accountId" value="@ViewData["AccountId"]">
                         <input type="hidden" class="form-control" id="userRole" name="userRole" value="@ViewData["UserRole"]">
                         <input type="hidden" class="form-control" id="loggedEmail" name="loggedEmail" value="@User.Identity.Name">
@@ -93,6 +94,14 @@
     $(function () {
         // Event listener for modal open event
         $('#returnDataModal').on('shown.bs.modal', function () {
+            var disputed = $('#isDisputed').val();
+
+            if (disputed == "True") {
+                $('#disputeLlink').html('Already disputed');
+            } else {
+                $('#disputeLlink').html('Dispute');
+            }
+
             // Fetch the PubDate dynamically
             var pubDate = $('#publicationDate').val(); 
             var formattedPubDate = encodeURIComponent(pubDate.replace(/\//g, '-'));

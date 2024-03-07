@@ -98,7 +98,8 @@ namespace QRSPortal2.Controllers
                                     ''
                                 ) AS RetailerAddress,
                                 U.PhoneNumber,
-                                U.CellNumber
+                                U.CellNumber,
+                                T.IsDisputed
                             FROM [dbo].[CircProTransactions] T
                             JOIN [dbo].[CircproUsers] U ON U.AccountID = T.AccountID
                             JOIN [dbo].[CircProAddresses] A ON U.UserID = A.UserID

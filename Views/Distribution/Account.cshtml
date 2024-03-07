@@ -7,6 +7,12 @@
     .dataTables_filter label {
         display: block;
     }
+
+    table a
+    {
+        color:#212529 !important;
+        font-weight: 500 !important;
+    }
 </style>
 <section class="section">
     <div class="row">
@@ -80,6 +86,7 @@
                                         @Html.HiddenFor(modelItem => item.ReturnAmount)
                                         @Html.HiddenFor(modelItem => item.ConfirmedAmount)
                                         @Html.HiddenFor(modelItem => item.DistributionAmount)
+                                        @Html.HiddenFor(modelItem => item.IsDisputed)
 
                                     </td>
                                     <td class="text-center">
@@ -107,7 +114,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th colspan="4" style="text-align:right">Avg Returns:</th>
+                                <th colspan="4" style="text-align: right">Avg Returns:</th>
                                 <th></th>
                             </tr>
                         </tfoot>
@@ -169,6 +176,7 @@
             var returnAmt = $(this).closest('tr').find('input#item_ReturnAmount').val();
             var drawAmt = $(this).closest('tr').find('input#item_DistributionAmount').val();
             var confirmAmt = $(this).closest('tr').find('input#item_ConfirmedAmount').val();
+            var isDisputed = $(this).closest('tr').find('input#item_IsDisputed').val();
             //console.log('returnAmt', returnAmt);
             publicationDate = $(this).find(':first-child').val();
             if (!publicationDate) {
@@ -180,6 +188,7 @@
             $('#returnAmount').val(returnAmt);
             $('#drawAmount').val(drawAmt);
             $('#confirmAmount').val(confirmAmt);
+            $('#isDisputed').val(isDisputed);
             $('.showDrawCnt').html(drawAmt);
 
 
