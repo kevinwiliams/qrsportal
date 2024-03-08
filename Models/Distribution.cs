@@ -37,6 +37,7 @@ namespace QRSPortal2.Models
         public string PhoneNumber { get; set; }
         public string CellNumber { get; set; }
         public Nullable<bool> IsDisputed { get; set; }
+        public string RetailerNote { get; set; }
     }
 
 

@@ -289,6 +289,7 @@ namespace QRSPortal2.Controllers
                 string publicationDate = frm["disputePublicationDate"];
                 string loggedEmail = frm["loggedEmail"];
                 string userRole = frm["userRole"];
+                string retailerNote = frm["retailerNote"];
                 DateTime parsedPublicationDate;
                 
                 DistributionData distributionData = new DistributionData();
@@ -337,6 +338,7 @@ namespace QRSPortal2.Controllers
                         var result = await _db.Database.SqlQuery<DistributionData>(sql, accountID, pubDate).FirstOrDefaultAsync();
                         distributionData = result;
                         distributionData.DisputeAmount = Convert.ToInt32(disputeAmount);
+                        distributionData.RetailerNote = retailerNote;
 
                         //set up email
                         string subject = "QRS Draw Dispute - " + accountId;
