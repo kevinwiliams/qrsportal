@@ -77,7 +77,7 @@ namespace QRSPortal2.Controllers
                     {
                         response = Json(new
                         {
-                            LASTUPDATED = result.FirstOrDefault().CreatedAt.ToString("yyyy-mm-dd h:mm tt"),
+                            LASTUPDATED = result.FirstOrDefault().CreatedAt.ToString("yyyy-MM-dd h:mm tt"),
                             RETAMT = result.FirstOrDefault().ReturnAmount,
                             USER = result.FirstOrDefault().UserName
                         });
