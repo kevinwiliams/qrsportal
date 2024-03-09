@@ -197,6 +197,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ActivityController.cs" />
     <Compile Include="Controllers\DistributionController.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\RetailerController.cs" />
@@ -415,6 +416,7 @@
     <Content Include="Views\Emails\ConfirmReturn.cshtml" />
     <Content Include="Views\Emails\DrawDispute.cshtml" />
     <Content Include="Views\Emails\ConfirmReturnRetailer.cshtml" />
+    <Content Include="Views\Error\Error404.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

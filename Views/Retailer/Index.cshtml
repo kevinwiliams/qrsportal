@@ -11,8 +11,30 @@
     <div class="loader"></div>
     <p>Loading...</p>
 </div>
-<section class="section">
+<section class="section dashboard">
     <div class="row">
+        <div class="col-xxl-12 col-xl-12">
+
+            <div class="card info-card customers-card">
+                <div class="card-body">
+                    <h5 class="card-title">Retailers <span>| This Year</span></h5>
+
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="ps-3">
+                            <h6>@ViewData["CircproUsers"]</h6>
+                            <span class="text-danger small pt-1 fw-bold d-none">12%</span> <span class="text-muted small pt-2 ps-1 d-none">decrease</span>
+                            <button class="btn btn-primary btn-sm" id="getNewUser" name="getNewUser">Check for new users</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
         <div class="col-lg-12">
 
             <div class="card">
@@ -32,8 +54,8 @@
                                     @Html.DisplayNameFor(model => model.RetailerName)
                                 </th>
                                 <th>
-                                        @Html.DisplayNameFor(model => model.EmailAddress)
-                                    </th>
+                                    @Html.DisplayNameFor(model => model.EmailAddress)
+                                </th>
                                 <th>
                                     @Html.DisplayNameFor(model => model.Company)
                                 </th>
@@ -63,8 +85,8 @@
                                         @Html.DisplayFor(modelItem => item.RetailerName)
                                     </td>
                                     <td>
-                                            @Html.DisplayFor(modelItem => item.EmailAddress)
-                                        </td>
+                                        @Html.DisplayFor(modelItem => item.EmailAddress)
+                                    </td>
                                     <td>
                                         @Html.DisplayFor(modelItem => item.Company)
                                     </td>
@@ -86,6 +108,8 @@
                         </tbody>
                     </table>
 
+                    <input type="hidden" name="allRetailers" id="allRetailers" value="@ViewData["AllRetailers"]" />
+
                     <!-- End Default Table Example -->
                 </div>
             </div>
@@ -97,12 +121,16 @@
 <script src="~/Scripts/addons.js"></script>
 
 <script>
+    function ReloadPage() {
+        location.reload();
+    }
+
     showLoadingScreen();
 
     $('[name=loadAccount]').on('click', function (e) { showLoadingScreen(); });
 
     $(document).ready(function () {
-            hideLoadingScreen();
+        hideLoadingScreen();
 
        $(window).on('pageshow', function (event) {
             // Check if the event's persisted property is false
@@ -144,6 +172,48 @@
                 // Add a class to the search label
                 $('.dataTables_filter label').addClass('form-label');                                                                                                                                                                                                                                                                                                       
             }
+
+        });
+
+         $('[name=getNewUser]').click(function () {
+            var spinner = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
+            $('[name=getNewUser]').html(spinner);
+            $('[name=getNewUser]').attr('disabled', true);
+
+            $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("GetNewUsers", "retailer")',
+                    dataType: 'json',
+                data: {
+                    emails: $('#allRetailers').val()
+                },
+                success: function (response) {
+                    console.log(response);
+                     if (response.success) {
+                       console.log(response.success);
+
+                        swal({
+                            title: "Success!",
+                            text: "Retailer list updated!",
+                            type: "success",
+                            dangerMode: false
+                        });
+
+                        setTimeout(
+                            ReloadPage
+                            , 2500);
+                    } else {
+                       swal({
+                            title: "Error!",
+                            text: "No new users found!",
+                            type: "warning",
+                            dangerMode: true
+                        });
+                    }
+
+
+                    }
+                });
 
         });
 

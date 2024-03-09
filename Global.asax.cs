@@ -16,6 +16,8 @@ namespace QRSPortal2
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+            //catch 404
+            GlobalFilters.Filters.Add(new HandleErrorAttribute());
         }
     }
 }

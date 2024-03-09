@@ -22,6 +22,7 @@ namespace QRSPortal2.Models
         public string COMPANY { get; set; }
         public string ADDRESS_LINE2 { get; set; }
         public string ADDRESS_LINE3 { get; set; }
+        public DateTime DATE_TIME_STAMP { get; set; }
     }
 
     public class CircProDistribution

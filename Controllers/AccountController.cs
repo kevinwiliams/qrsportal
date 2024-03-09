@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Configuration;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Microsoft.AspNet.Identity;
@@ -486,21 +487,40 @@ namespace QRSPortal2.Controllers
         [NonAction]
         public bool IsEmailExist(string emailAddress)
         {
-
             try
             {
+                // Check if the email address is in a valid format
+                if (!IsValidEmail(emailAddress))
+                {
+                    return false; // Not a valid email address format
+                }
+
                 using (ApplicationDbContext dc = new ApplicationDbContext())
                 {
-                    var v = dc.CircproUsers.Where(a => a.EmailAddress == emailAddress).FirstOrDefault();
-                    return v != null;
+                    // Check if the email address exists in the database
+                    var v = dc.CircproUsers.FirstOrDefault(a => a.EmailAddress == emailAddress);
+                    return v != null; // Return true if the email address exists in the database
                 }
             }
             catch (Exception ex)
             {
-
+                // Handle any exceptions
                 throw ex;
             }
+        }
 
+        // Method to validate email address format
+        private bool IsValidEmail(string emailAddress)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(emailAddress);
+                return addr.Address == emailAddress;
+            }
+            catch
+            {
+                return false; // Invalid email address format
+            }
         }
 
         public async Task<bool> MigrateUsers()
@@ -637,7 +657,7 @@ namespace QRSPortal2.Controllers
                 using (HttpClient client = new HttpClient())
                 {
                     // Define the URL of the ASP page
-                    string url = "https://janus.jamaicaobserver.com/circ/api_acct_date.asp";
+                    string url = WebConfigurationManager.AppSettings["circProAPI_load_tranx"]; 
 
                     // Define your form data as key-value pairs
                     var formData = new Dictionary<string, string>
@@ -723,7 +743,7 @@ namespace QRSPortal2.Controllers
                 using (HttpClient client = new HttpClient())
                 {
                     // Define the URL of the ASP page
-                    string url = "https://janus.jamaicaobserver.com/circ/api_acct_date.asp";
+                    string url = WebConfigurationManager.AppSettings["circProAPI_load_tranx"]; 
 
                     // Define your form data as key-value pairs
                     var formData = new Dictionary<string, string>
@@ -768,6 +788,137 @@ namespace QRSPortal2.Controllers
                         // If the request was not successful, output the status code
                         Console.WriteLine($"Request failed with status code {response.StatusCode}");
                         return true;
+                    }
+                }
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+
+                //throw ex;
+                LogError(ex);
+                return false;
+            }
+        }
+
+        public async Task<bool> LoadNewRetailers(string emails)
+        {
+
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    // Define the URL of the ASP page
+                    string url = WebConfigurationManager.AppSettings["circProAPI_new_user"]; 
+
+                    // Define your form data as key-value pairs
+                    var formData = new Dictionary<string, string>
+                    {
+                        { "emails", emails }
+                    };
+
+                    // Encode the form data
+                    var encodedFormData = new FormUrlEncodedContent(formData);
+
+                    // Set Content-Type header
+                    encodedFormData.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
+
+                    // Send the POST request and get the response
+                    HttpResponseMessage response = await client.PostAsync(url, encodedFormData);
+
+                    // Check if the request was successful
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var json = await response.Content.ReadAsStringAsync();
+                        var result = JsonConvert.DeserializeObject<List<CircProUserList>>(json);
+
+                        foreach (var item in result)
+                        {
+                            var isValidEmail = IsValidEmail(item.EMAIL);
+                            if (isValidEmail)
+                            {
+                                var isExist = IsEmailExist(item.EMAIL);
+                                if (!isExist)
+                                {
+                                    string UserID = "";
+                                    int addressID = 0;
+                                    var emailAddress = item.EMAIL;
+                                    var FullName = (item.FIRST_NAME == "null" ? null : item.FIRST_NAME) + " " + (item.LAST_NAME == "null" ? null : item.LAST_NAME);
+                                    FullName = (FullName != null) ? FullName : (item.COMPANY == "null" ? null : item.COMPANY);
+
+                                    CircproUsers circProUsers = new CircproUsers
+                                    {
+                                        AccountID = item.ACCOUNT,
+                                        //AddressID = item.ADDRESSID,
+                                        CellNumber = item.CELL_NUMBER == "null" ? null : item.CELL_NUMBER,
+                                        Company = item.COMPANY == "null" ? null : item.COMPANY,
+                                        DistributionID = item.DISTRIBUTION_ID,
+                                        EmailAddress = emailAddress,
+                                        FirstName = item.FIRST_NAME == "null" ? null : item.FIRST_NAME,
+                                        LastName = item.LAST_NAME == "null" ? null : item.LAST_NAME,
+                                        PhoneNumber = item.PHONE_NUMBER == "null" ? null : item.PHONE_NUMBER,
+                                        CreatedAt = item.DATE_TIME_STAMP,
+                                        IsActive = true
+                                    };
+
+                                    CircProAddress circProAddress = new CircProAddress
+                                    {
+                                        AccountID = item.ACCOUNT,
+                                        EmailAddress = emailAddress,
+                                        AddressLine1 = item.ADDRESS_LINE1 == "null" ? null : item.ADDRESS_LINE1,
+                                        AddressLine2 = item.ADDRESS_LINE2 == "null" ? null : item.ADDRESS_LINE2,
+                                        CityTown = item.ADDRESS_LINE3 == "null" ? null : item.ADDRESS_LINE3,
+                                        CreatedAt = item.DATE_TIME_STAMP,
+
+                                    };
+
+                                    var newAccount = new ApplicationUser
+                                    {
+                                        UserName = emailAddress,
+                                        FullName = FullName,
+                                        Email = emailAddress,
+                                        CircproUser = circProUsers
+                                    };
+                                    //create application user
+                                    var createAccount = await UserManager.CreateAsync(newAccount, "Password-01!");
+                                    if (createAccount.Succeeded)
+                                    {
+                                        UserID = newAccount.Id;
+                                        var userRole = (newAccount.Email.ToLower().Contains("jamaicaobserver.com")) ? "Circulation" : "Retailer";
+
+                                        //assign User Role
+                                        createAccount = await UserManager.AddToRoleAsync(UserID, userRole);
+                                        circProAddress.UserID = UserID;
+                                        _db.CircProAddress.Add(circProAddress);
+                                        await _db.SaveChangesAsync();
+
+                                        //Get Address ID
+                                        addressID = circProAddress.AddressID;
+
+                                        //update subscribers table w/ address ID
+                                        var circUser = _db.CircproUsers.SingleOrDefault(b => b.UserID == UserID);
+                                        if (circUser != null)
+                                        {
+                                            circUser.AddressID = addressID;
+                                            await _db.SaveChangesAsync();
+                                        }
+
+                                        AddErrors(createAccount);
+
+                                    }
+
+                                }
+                            }
+                            
+                        }
+                    }
+                    else
+                    {
+                        // If the request was not successful, output the status code
+                        Console.WriteLine($"Request failed with status code {response.StatusCode}");
+                        return false;
                     }
                 }
 
