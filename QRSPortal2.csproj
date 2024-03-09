@@ -417,6 +417,7 @@
     <Content Include="Views\Emails\DrawDispute.cshtml" />
     <Content Include="Views\Emails\ConfirmReturnRetailer.cshtml" />
     <Content Include="Views\Error\Error404.cshtml" />
+    <Content Include="Views\Emails\PasswordReset.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
