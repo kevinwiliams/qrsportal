@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace QRSPortal2.Models
 {
     public class Reports
     {
+        public SupervisorReport SupervisorReport { get; set; }
     }
 
     public class SupervisorReport
@@ -31,5 +33,7 @@ namespace QRSPortal2.Models
         public int TotalReturnAmount { get; set; }
         [Display(Name = "DRAW")]
         public int TotalDistributionAmount { get; set; }
+        public string Supervisors { get; set; }
+        public string Retailers { get; set; }
     }
 }

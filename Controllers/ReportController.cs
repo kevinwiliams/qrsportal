@@ -29,6 +29,17 @@ namespace QRSPortal2.Controllers
                           FROM [QRS_DB].[dbo].[View_Supervisor_Report]";
 
                 var result = _db.Database.SqlQuery<SupervisorReport>(sql).ToList();
+
+                var supervisorList = new List<SelectListItem>();
+                var supervisorNames = new SelectList(result.Where(u => u.UserName != null).OrderBy(u => u.UserName).Select(u => u.UserName).Distinct().ToList());
+
+                foreach (var role in supervisorNames)
+                {
+                    supervisorList.Add(new SelectListItem { Text = role.Text, Value = role.Value });
+                }
+
+                ViewBag.Supervisors = supervisorList;
+
                 return View(result);
 
             }

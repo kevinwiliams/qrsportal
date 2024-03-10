@@ -11,6 +11,24 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Daily Report</h5>
+                    <div class="row pb-3">
+                        <div class="col-lg-3 col-md-6 form-group">
+                            @Html.Label("Supervisors:")
+                            @Html.DropDownList("Supervisors", (IEnumerable<SelectListItem>)ViewBag.Supervisors as SelectList, "Select Supervisor",  new { @class = "form-select" } )
+                        </div>
+                            <div class="col-lg-3 col-md-6 form-group">
+                                @Html.Label("Start Date:")
+                                @Html.TextBox("startDate", null, new { @class = "form-control datepicker", @type = "date", @required = "required" })
+                            </div>
+                            <div class="col-lg-3 col-md-6 form-group">
+                                @Html.Label("End Date:")
+                                @Html.TextBox("endDate", null, new { @class = "form-control datepicker", @type = "date", @required = "required" })
+                            </div>
+                            <div class="col-lg-3 col-md-6 form-group">
+                                <button id="filterBtn" type="submit" class="btn btn-primary mt-4">Filter</button>
+                            </div>
+                      
+                    </div>
                     <table class="table small dtSupReport">
                         <thead>
                             <tr>
