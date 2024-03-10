@@ -7,7 +7,7 @@ using System.Web.Mvc;
 
 namespace QRSPortal2.Controllers
 {
-    [Authorize(Roles = "Admin, Circulation, Supervisor")]
+    [Authorize(Roles = "Admin, Circulation")]
     public class ReportController : Controller
     {
         private ApplicationDbContext _db = new ApplicationDbContext();
