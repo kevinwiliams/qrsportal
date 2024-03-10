@@ -1,0 +1,90 @@
+﻿@model IEnumerable<QRSPortal2.Models.SupervisorReport>
+
+@{
+    ViewBag.Title = "Supervisor Report";
+}
+
+<section class="section dashboard">
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Daily Report</h5>
+                    <table class="table small dtSupReport">
+                        <thead>
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.UserName)
+                                </th>
+                              
+                                <th>
+                                    @Html.DisplayNameFor(model => model.AccountID)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.RetailerName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Company)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.RetailerAddress)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.PublicationDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.TotalDistributionAmount)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.TotalReturnAmount)
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.UserName)
+                                </td>
+                               
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AccountID)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.RetailerName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Company)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.RetailerAddress)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.PublicationDate)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TotalDistributionAmount)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TotalReturnAmount)
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@Scripts.Render("~/bundles/jquery")
+<script>
+    $(document).ready(function () {
+        $('.dtSupReport').DataTable({});
+    });
+</script>

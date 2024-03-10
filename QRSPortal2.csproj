@@ -200,6 +200,7 @@
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\RetailerController.cs" />
     <Compile Include="Filters\ValidateGoogleCaptchaAttribute.cs" />
     <Compile Include="Global.asax.cs">
@@ -223,6 +224,7 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Profile.cs" />
+    <Compile Include="Models\Reports.cs" />
     <Compile Include="Models\Retailer.cs" />
     <Compile Include="Models\RoleViewModel.cs" />
     <Compile Include="Models\TransactionData.cs" />
@@ -418,6 +420,7 @@
     <Content Include="Views\Emails\ConfirmReturnRetailer.cshtml" />
     <Content Include="Views\Error\Error404.cshtml" />
     <Content Include="Views\Emails\PasswordReset.cshtml" />
+    <Content Include="Views\Report\Supervisor.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
