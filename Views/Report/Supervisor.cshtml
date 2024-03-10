@@ -17,7 +17,7 @@
                                 <th>
                                     @Html.DisplayNameFor(model => model.UserName)
                                 </th>
-                              
+
                                 <th>
                                     @Html.DisplayNameFor(model => model.AccountID)
                                 </th>
@@ -45,36 +45,41 @@
                         <tbody>
                             @foreach (var item in Model)
                             {
-                            <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.UserName)
-                                </td>
-                               
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.AccountID)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.RetailerName)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Company)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.RetailerAddress)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.PublicationDate)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.TotalDistributionAmount)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.TotalReturnAmount)
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.UserName)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.AccountID)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.RetailerName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Company)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.RetailerAddress)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.PublicationDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.TotalDistributionAmount)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.TotalReturnAmount)
+                                    </td>
+                                </tr>
                             }
                         </tbody>
-
+                        <tfoot>
+                            <tr>
+                                <th>Total</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
 
                     </table>
                 </div>
@@ -83,8 +88,48 @@
     </div>
 </section>
 @Scripts.Render("~/bundles/jquery")
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
 <script>
     $(document).ready(function () {
-        $('.dtSupReport').DataTable({});
+        //$('.dtSupReport').DataTable({});
+        $('.dtSupReport').DataTable({
+            //order: [[1, 'desc']],
+            pageLength: 30,
+            dom: 'Bfrtip',
+            buttons: [
+                'excel', 'print'
+            ],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api(), data;
+
+                // Remove the formatting to get integer data for summation
+                var intVal = function (i) {
+                    return typeof i === 'string' ? i.replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
+                };
+
+                // Total over all pages
+                var total = api
+                    .column(6)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                // Total over this page
+                var pageTotal = api
+                    .column(6, { page: 'current' })
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                // Update footer
+                $(api.column(6).footer()).html(pageTotal + ' (' + total + ' total)');
+                 // Update the footer
+                //api.column(6).footer().innerHTML = pageTotal + ' (' + total + ' total)';
+            },
+
+        });
     });
 </script>
