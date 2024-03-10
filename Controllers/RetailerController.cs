@@ -18,13 +18,12 @@ namespace QRSPortal2.Controllers
         // GET: Retailer
         public ActionResult Index()
         {
-            AccountController ac = new AccountController();
-            ac.InitializeController(this.Request.RequestContext);
+            _ac.InitializeController(this.Request.RequestContext);
             try
             {
                 ViewData["Error"] = TempData["Error"];
-                ViewData["UserRole"] = ac.GetUserData()["UserRole"];
-                ViewData["UserName"] = ac.GetUserData()["UserName"];
+                ViewData["UserRole"] = _ac.GetUserData()["UserRole"];
+                ViewData["UserName"] = _ac.GetUserData()["UserName"];
 
                 var sql = @"SELECT DISTINCT
                                 U.AccountID, 
@@ -45,6 +44,7 @@ namespace QRSPortal2.Controllers
 
                 var result = _db.Database.SqlQuery<Retailer>(sql).ToList();
                 var retailerCnt = result.Count();
+                int maxDistributionId = result.Max(x => x.DistributionID);
 
                 // Construct a string with delimited emails and single quotes
                 //string delimitedEmails = string.Join(",", result.Select(x => $"'{x.EmailAddress}'"));
@@ -54,7 +54,7 @@ namespace QRSPortal2.Controllers
 
                 // Assign the string to ViewData
                 ViewData["CircproUsers"] = retailerCnt;
-                //ViewData["AllRetailers"] = delimitedEmails;
+                ViewData["MaxDistId"] = maxDistributionId;
                 //TODO:Loop to trim address field
 
                 return View(result);
@@ -70,13 +70,13 @@ namespace QRSPortal2.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<JsonResult> GetNewUsers(string emails)
+        public async Task<JsonResult> GetNewUsers(string id)
         {
             try
             {
                 _ac.InitializeController(this.Request.RequestContext);
 
-                return Json(new { success = await _ac.LoadNewRetailers(emails) });
+                return Json(new { success = await _ac.LoadNewRetailers(id) });
             }
             catch (Exception ex)
             {

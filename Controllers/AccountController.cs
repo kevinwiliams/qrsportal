@@ -803,7 +803,7 @@ namespace QRSPortal2.Controllers
             }
         }
 
-        public async Task<bool> LoadNewRetailers(string emails)
+        public async Task<bool> LoadNewRetailers(string id)
         {
 
             try
@@ -816,7 +816,7 @@ namespace QRSPortal2.Controllers
                     // Define your form data as key-value pairs
                     var formData = new Dictionary<string, string>
                     {
-                        { "emails", emails }
+                        { "distribution_id", id }
                     };
 
                     // Encode the form data

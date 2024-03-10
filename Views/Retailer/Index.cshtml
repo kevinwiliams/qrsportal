@@ -26,7 +26,7 @@
                         <div class="ps-3">
                             <h6>@ViewData["CircproUsers"]</h6>
                             <span class="text-danger small pt-1 fw-bold d-none">12%</span> <span class="text-muted small pt-2 ps-1 d-none">decrease</span>
-                            <button class="btn btn-primary btn-sm" id="getNewUser" name="getNewUser">Check for new users</button>
+                            <button class="btn btn-success btn-sm" id="getNewUser" name="getNewUser"><i class="bi bi-box-arrow-in-down"></i> Pull new users</button>
                         </div>
                     </div>
 
@@ -108,7 +108,7 @@
                         </tbody>
                     </table>
 
-                    <input type="hidden" name="allRetailers" id="allRetailers" value="@ViewData["AllRetailers"]" />
+                    <input type="hidden" name="maxDistId" id="maxDistId" value="@ViewData["MaxDistId"]" />
 
                     <!-- End Default Table Example -->
                 </div>
@@ -185,7 +185,7 @@
                     url: '@Url.Action("GetNewUsers", "retailer")',
                     dataType: 'json',
                 data: {
-                    emails: $('#allRetailers').val()
+                    id: $('#maxDistId').val()
                 },
                 success: function (response) {
                     console.log(response);
