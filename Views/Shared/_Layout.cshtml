@@ -117,7 +117,7 @@
 
                 <ul class="sidebar-nav" id="sidebar-nav">
                     @{
-                        if (User.IsInRole("Circulation") || User.IsInRole("Admin") || User.IsInRole("Supervisor"))
+                        if (User.IsInRole("Circulation") || User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link collapsed" href=" @Url.Action("index", "home")">
@@ -132,7 +132,7 @@
                                 </a>
                             </li>
 
-                           
+
                             <li class="nav-item">
                                 <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
                                     <i class="bi bi-clipboard2-data"></i><span>Reports</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -144,10 +144,29 @@
                                             <span>Supervisors</span>
                                         </a>
                                     </li>
-                                    
+
                                 </ul>
                             </li>
                         }
+                        if (User.IsInRole("Retailer"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link collapsed" href=" @Url.Action("index", "home")">
+                                    <i class="bi bi-grid"></i>
+                                    <span>Home</span>
+                                </a>
+                            </li>
+                        }
+                        if (User.IsInRole("Supervisor"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link collapsed" href=" @Url.Action("index", "retailer")">
+                                    <i class="bi bi-grid"></i>
+                                    <span>Home</span>
+                                </a>
+                            </li>
+                        }
+
 
                     }
 

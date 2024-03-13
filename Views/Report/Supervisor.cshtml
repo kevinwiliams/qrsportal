@@ -107,10 +107,10 @@
         var startDate = $('[name=startDate]').val();
         var endDate = $('[name=endDate]').val();
 
-        if (startDate == '' || endDate == '') {
-            alert('Please select a start and end date.');
-            return false;
-        }
+        //if (startDate == '' || endDate == '') {
+        //    alert('Please select a start and end date.');
+        //    return false;
+        //}
 
         if (moment(startDate).isAfter(endDate)) {
             alert('The end date must be after the start date.');
