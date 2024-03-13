@@ -338,6 +338,8 @@ namespace QRSPortal2.Controllers
                 existingProfile.RetailerInfo.Company = updatedProfile.RetailerInfo.Company;
                 existingProfile.RetailerInfo.Company = updatedProfile.RetailerInfo.PhoneNumber;
                 existingProfile.RetailerInfo.Company = updatedProfile.RetailerInfo.CellNumber;
+                existingProfile.RetailerInfo.NotifyEmail = updatedProfile.RetailerInfo.NotifyEmail;
+
 
                 // Update address data
                 existingProfile.RetailerAddress.AddressLine1 = updatedProfile.RetailerAddress.AddressLine1;

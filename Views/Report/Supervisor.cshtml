@@ -19,11 +19,11 @@
                                 @Html.DropDownList("supervisors", (IEnumerable<SelectListItem>)ViewBag.Supervisors as SelectList, "All Contractors", new { @class = "form-select form-select-sm" })
                             </div>
                             <div class="col-lg-3 col-md-6 form-group">
-                                @Html.Label("Start Date:")
+                                @Html.Label("Publish Start Date:")
                                 @Html.TextBox("startDate", null, new { @class = "form-control form-control-sm datepicker", @type = "date", @required = "required" })
                             </div>
                             <div class="col-lg-3 col-md-6 form-group">
-                                @Html.Label("End Date:")
+                                @Html.Label("Publish End Date:")
                                 @Html.TextBox("endDate", null, new { @class = "form-control form-control-sm datepicker", @type = "date", @required = "required" })
                             </div>
                             <div class="col-lg-3 col-md-6 form-group">
