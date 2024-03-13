@@ -1,6 +1,7 @@
 ﻿using QRSPortal2.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -50,6 +51,82 @@ namespace QRSPortal2.Controllers
                 return View();
             }
         }
+
+
+
+        [HttpPost]
+        public ActionResult Supervisor(string supervisors, DateTime? startDate, DateTime? endDate)
+        {
+            try
+            {
+                // SQL query without filtering conditions initially
+                var sql = @"
+                    SELECT [UserName]
+                          ,[EmailAddress]
+                          ,[AccountID]
+                          ,[RetailerName]
+                          ,[Company]
+                          ,[RetailerAddress]
+                          ,[PublicationDate]
+                          ,[TotalReturnAmount]
+                          ,[TotalDistributionAmount]
+                    FROM [QRS_DB].[dbo].[View_Supervisor_Report]";
+
+                var supeList = _db.Database.SqlQuery<SupervisorReport>(sql).ToList();
+                var supervisorList = new List<SelectListItem>();
+                var supervisorNames = new SelectList(supeList.Where(u => u.UserName != null).OrderBy(u => u.UserName).Select(u => u.UserName).Distinct().ToList());
+
+                foreach (var role in supervisorNames)
+                {
+                    supervisorList.Add(new SelectListItem { Text = role.Text, Value = role.Value });
+                }
+
+                ViewBag.Supervisors = supervisorList;
+                // List to store SQL parameters
+                var parameters = new List<SqlParameter>();
+
+                // Check if supervisor name is provided
+                if (!string.IsNullOrEmpty(supervisors))
+                {
+                    sql += " WHERE [UserName] LIKE '%' + @supervisor + '%'";
+                    parameters.Add(new SqlParameter("@supervisor", supervisors));
+                }
+
+                // Check if start date is provided
+                if (startDate.HasValue)
+                {
+                    if (parameters.Any())
+                        sql += " AND [PublicationDate] >= @startDate";
+                    else
+                        sql += " WHERE [PublicationDate] >= @startDate";
+
+                    parameters.Add(new SqlParameter("@startDate", startDate.Value));
+                }
+
+                // Check if end date is provided
+                if (endDate.HasValue)
+                {
+                    if (parameters.Any())
+                        sql += " AND [PublicationDate] <= @endDate";
+                    else
+                        sql += " WHERE [PublicationDate] <= @endDate";
+
+                    parameters.Add(new SqlParameter("@endDate", endDate.Value));
+                }
+
+                // Execute the SQL query with parameters
+                var result = _db.Database.SqlQuery<SupervisorReport>(sql, parameters.ToArray()).ToList();
+
+                return View(result);
+            }
+            catch (Exception ex)
+            {
+                Util.LogError(ex);
+                return View();
+            }
+            
+        }
+
 
         // GET: Report/Details/5
         public ActionResult Details(int id)

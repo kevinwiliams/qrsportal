@@ -1,0 +1,15 @@
+﻿@model IEnumerable<QRSPortal2.Models.SupervisorReport>
+
+@foreach (var item in Model)
+{
+    <tr>
+        <td>@Html.DisplayFor(modelItem => item.UserName)</td>
+        <td>@Html.DisplayFor(modelItem => item.AccountID)</td>
+        <td>@Html.DisplayFor(modelItem => item.RetailerName)</td>
+        <td>@Html.DisplayFor(modelItem => item.Company)</td>
+        <td>@Html.DisplayFor(modelItem => item.RetailerAddress)</td>
+        <td>@Html.DisplayFor(modelItem => item.PublicationDate)</td>
+        <td>@Html.DisplayFor(modelItem => item.TotalDistributionAmount)</td>
+        <td>@Html.DisplayFor(modelItem => item.TotalReturnAmount)</td>
+    </tr>
+}

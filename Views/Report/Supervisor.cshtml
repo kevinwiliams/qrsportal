@@ -11,96 +11,76 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Daily Report</h5>
-                    <div class="row pb-3">
-                        <div class="col-lg-3 col-md-6 form-group">
-                            @Html.Label("Supervisors:")
-                            @Html.DropDownList("Supervisors", (IEnumerable<SelectListItem>)ViewBag.Supervisors as SelectList, "Select Supervisor",  new { @class = "form-select" } )
-                        </div>
+                    @using (Html.BeginForm("supervisor", "report", FormMethod.Post, new { @name = "supervisorReport" }))
+                    {
+                        <div class="row pb-3">
+                            <div class="col-lg-3 col-md-6 form-group">
+                                @Html.Label("Supervisors:")
+                                @Html.DropDownList("supervisors", (IEnumerable<SelectListItem>)ViewBag.Supervisors as SelectList, "All Contractors", new { @class = "form-select form-select-sm" })
+                            </div>
                             <div class="col-lg-3 col-md-6 form-group">
                                 @Html.Label("Start Date:")
-                                @Html.TextBox("startDate", null, new { @class = "form-control datepicker", @type = "date", @required = "required" })
+                                @Html.TextBox("startDate", null, new { @class = "form-control form-control-sm datepicker", @type = "date", @required = "required" })
                             </div>
                             <div class="col-lg-3 col-md-6 form-group">
                                 @Html.Label("End Date:")
-                                @Html.TextBox("endDate", null, new { @class = "form-control datepicker", @type = "date", @required = "required" })
+                                @Html.TextBox("endDate", null, new { @class = "form-control form-control-sm datepicker", @type = "date", @required = "required" })
                             </div>
                             <div class="col-lg-3 col-md-6 form-group">
-                                <button id="filterBtn" type="submit" class="btn btn-primary mt-4">Filter</button>
+                                <button id="filterBtn" type="submit" class="btn btn-primary btn-sm mt-4">Filter</button>
                             </div>
-                      
+
+                        </div>
+                    }
+                <table class="table small dtSupReport">
+                    <caption id="dateRange">
+                        <strong>From:</strong> <span id="sDate"></span> - <strong>To:</strong> <span id="eDate"></span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.UserName)
+                            </th>
+
+                            <th>
+                                @Html.DisplayNameFor(model => model.AccountID)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.RetailerName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Company)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.RetailerAddress)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.PublicationDate)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.TotalDistributionAmount)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.TotalReturnAmount)
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <!-- Dispute Modal -->
+                        @{Html.RenderPartial("_FilteredReportTable"); }
+                        <!-- end: Dispute Modal -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="6">Total</th>
+                            <th>2</th>
+                            <th>4</th>
+                        </tr>
+                    </tfoot>
+
+                </table>
                     </div>
-                    <table class="table small dtSupReport">
-                        <thead>
-                            <tr>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.UserName)
-                                </th>
-
-                                <th>
-                                    @Html.DisplayNameFor(model => model.AccountID)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.RetailerName)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.Company)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.RetailerAddress)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.PublicationDate)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.TotalDistributionAmount)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.TotalReturnAmount)
-                                </th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @foreach (var item in Model)
-                            {
-                                <tr>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.UserName)
-                                    </td>
-
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.AccountID)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.RetailerName)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Company)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.RetailerAddress)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.PublicationDate)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.TotalDistributionAmount)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.TotalReturnAmount)
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th>Total</th>
-                                <th></th>
-                            </tr>
-                        </tfoot>
-
-                    </table>
-                </div>
             </div>
         </div>
     </div>
@@ -109,15 +89,44 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
 <script>
+    $('[name=startDate]').change(function (e) {
+        var s = $(this).val();
+        var sDate = moment(s).format('LL');
+        $('#sDate').html(sDate);
+    });
+
+    $('[name=endDate]').change(function (e) {
+        var d = $(this).val();
+        var eDate = moment(d).format('LL');
+        $('#eDate').html(eDate);
+    });
+
+    // Submit form on button click
+    $('#filterBtn').click(function (e) {
+        e.preventDefault();
+        var startDate = $('[name=startDate]').val();
+        var endDate = $('[name=endDate]').val();
+
+        if (startDate == '' || endDate == '') {
+            alert('Please select a start and end date.');
+            return false;
+        }
+
+        if (moment(startDate).isAfter(endDate)) {
+            alert('The end date must be after the start date.');
+            return false;
+        }
+
+        // Submit form
+        $('[name=supervisorReport]').submit();
+    });
+
     $(document).ready(function () {
-        //$('.dtSupReport').DataTable({});
         $('.dtSupReport').DataTable({
             //order: [[1, 'desc']],
             pageLength: 30,
-            dom: 'Bfrtip',
-            buttons: [
-                'excel', 'print'
-            ],
+            dom: '<"row pb-3"<"col-lg-6"B><"col-lg-6"f>>tip', // Customized layout for DataTable components
+            buttons: [ 'excel', 'print' ],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
 
@@ -127,8 +136,15 @@
                 };
 
                 // Total over all pages
-                var total = api
+                var drawtotal = api
                     .column(6)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                var rettotal = api
+                    .column(7)
                     .data()
                     .reduce(function (a, b) {
                         return intVal(a) + intVal(b);
@@ -143,11 +159,14 @@
                     }, 0);
 
                 // Update footer
-                $(api.column(6).footer()).html(pageTotal + ' (' + total + ' total)');
+                $(api.column(6).footer()).html(drawtotal);
+                $(api.column(7).footer()).html(rettotal);
                  // Update the footer
                 //api.column(6).footer().innerHTML = pageTotal + ' (' + total + ' total)';
             },
 
         });
+
+       
     });
 </script>

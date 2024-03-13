@@ -219,6 +219,7 @@
     <Compile Include="ModelsDB\QRSActivityLog.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\CircProUsers.cs" />
+    <Compile Include="Models\DataTableParameters.cs" />
     <Compile Include="Models\Distribution.cs" />
     <Compile Include="Models\GoogleRecaptcha.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -353,6 +354,8 @@
     <Content Include="App_Data\email_settings.json" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-3.7.1.intellisense.js" />
+    <Content Include="Scripts\cleave-phone.i18n.js" />
+    <Content Include="Scripts\cleave.min.js" />
     <Content Include="Scripts\jquery-3.7.1.js" />
     <Content Include="Scripts\jquery-3.7.1.min.js" />
     <Content Include="Scripts\jquery-3.7.1.slim.js" />
@@ -364,6 +367,10 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\main.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Scripts\moment-with-locales.js" />
+    <Content Include="Scripts\moment-with-locales.min.js" />
+    <Content Include="Scripts\moment.js" />
+    <Content Include="Scripts\moment.min.js" />
     <Content Include="Scripts\sweetalert-dev.js" />
     <Content Include="Scripts\sweetalert.min.js" />
     <Content Include="Web.config" />
@@ -421,6 +428,9 @@
     <Content Include="Views\Error\Error404.cshtml" />
     <Content Include="Views\Emails\PasswordReset.cshtml" />
     <Content Include="Views\Report\Supervisor.cshtml" />
+    <Content Include="Views\Report\_FilteredReportTable.cshtml" />
+    <Content Include="Scripts\moment-with-locales.min.js.map" />
+    <Content Include="Scripts\moment.min.js.map" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
