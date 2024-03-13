@@ -925,6 +925,33 @@ namespace QRSPortal2
                 return emailSent = false;
             }
         }
+
+        public static bool IsUserInRole(string email, string roleName)
+        {
+            try
+            {
+                // Retrieve the user based on the email address
+                var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
+                var user = userManager.FindByEmail(email);
+
+                if (user != null)
+                {
+                    // Check if the user is in the specified role
+                    return userManager.IsInRole(user.Id, roleName);
+                }
+                else
+                {
+                    // User with the provided email address does not exist
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError(ex);
+                return false;
+            }
+
+        }
     }
 
     

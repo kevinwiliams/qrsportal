@@ -32,12 +32,17 @@ namespace QRSPortal2.Controllers
                 var result = _db.Database.SqlQuery<SupervisorReport>(sql).ToList();
 
                 var supervisorList = new List<SelectListItem>();
-                var supervisorNames = new SelectList(result.Where(u => u.UserName != null).OrderBy(u => u.UserName).Select(u => u.UserName).Distinct().ToList());
+                var supervisorNames = result
+                    .Where(u => u.UserName != null && u.EmailAddress != null)  // Filter out null email addresses
+                    .GroupBy(u => u.EmailAddress)  // Group by email address
+                    .Select(group => group.First())  // Select the first user within each group
+                    .OrderBy(u => u.UserName)  // Order by username
+                    .Distinct()
+                    .ToList();
 
-                foreach (var role in supervisorNames)
-                {
-                    supervisorList.Add(new SelectListItem { Text = role.Text, Value = role.Value });
-                }
+                foreach (var supervisor in supervisorNames)
+                    if(Util.IsUserInRole(supervisor.EmailAddress, "Supervisor"))
+                        supervisorList.Add(new SelectListItem { Text = supervisor.UserName, Value = supervisor.UserName });
 
                 ViewBag.Supervisors = supervisorList;
 
@@ -46,7 +51,6 @@ namespace QRSPortal2.Controllers
             }
             catch (Exception ex)
             {
-
                 Util.LogError(ex);
                 return View();
             }
@@ -74,12 +78,14 @@ namespace QRSPortal2.Controllers
 
                 var supeList = _db.Database.SqlQuery<SupervisorReport>(sql).ToList();
                 var supervisorList = new List<SelectListItem>();
-                var supervisorNames = new SelectList(supeList.Where(u => u.UserName != null).OrderBy(u => u.UserName).Select(u => u.UserName).Distinct().ToList());
+                var supervisorNames = supeList.Where(u => u.UserName != null && u.EmailAddress != null).GroupBy(u => u.EmailAddress).Select(group => group.First())
+                    .OrderBy(u => u.UserName)
+                    .Distinct()
+                    .ToList();
 
-                foreach (var role in supervisorNames)
-                {
-                    supervisorList.Add(new SelectListItem { Text = role.Text, Value = role.Value });
-                }
+                foreach (var supervisor in supervisorNames)
+                    if (Util.IsUserInRole(supervisor.EmailAddress, "Supervisor"))
+                        supervisorList.Add(new SelectListItem { Text = supervisor.UserName, Value = supervisor.UserName });
 
                 ViewBag.Supervisors = supervisorList;
                 // List to store SQL parameters
