@@ -33,7 +33,12 @@ namespace QRSPortal2.Models
         public int TotalReturnAmount { get; set; }
         [Display(Name = "DRAW")]
         public int TotalDistributionAmount { get; set; }
+        [Display(Name = "Logged")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd hh:mm:ss}")]
+        public DateTime CreatedAt { get; set; }
         public string Supervisors { get; set; }
         public string Retailers { get; set; }
+       
     }
 }

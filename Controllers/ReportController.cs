@@ -27,6 +27,7 @@ namespace QRSPortal2.Controllers
                               ,[PublicationDate]
                               ,[TotalReturnAmount]
                               ,[TotalDistributionAmount]
+                              ,[CreatedAt]
                           FROM [QRS_DB].[dbo].[View_Supervisor_Report]";
 
                 var result = _db.Database.SqlQuery<SupervisorReport>(sql).ToList();
@@ -78,6 +79,7 @@ namespace QRSPortal2.Controllers
                           ,[PublicationDate]
                           ,[TotalReturnAmount]
                           ,[TotalDistributionAmount]
+                          ,[CreatedAt]
                     FROM [QRS_DB].[dbo].[View_Supervisor_Report]";
 
                 var supeList = _db.Database.SqlQuery<SupervisorReport>(sql).ToList();
