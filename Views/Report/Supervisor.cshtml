@@ -32,55 +32,58 @@
 
                         </div>
                     }
-                <table class="table small dtSupReport">
-                    <caption id="dateRange">
-                        <strong>From:</strong> <span id="sDate"></span> - <strong>To:</strong> <span id="eDate"></span>
-                    </caption>
-                    <thead>
-                        <tr>
-                            <th>
-                                @Html.DisplayNameFor(model => model.UserName)
-                            </th>
+                    <table class="table small dtSupReport" id="dtSupReport">
+                        <caption id="dateRange">
+                            <span class="small">User: @ViewData["UserName"] / @User.Identity.Name / @DateTime.Now</span>
+                            @*<strong>From:</strong> <span id="sDate"></span> - <strong>To:</strong> <span id="eDate"></span>*@
 
-                            <th>
-                                @Html.DisplayNameFor(model => model.AccountID)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.RetailerName)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.Company)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.RetailerAddress)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.PublicationDate)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.TotalDistributionAmount)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.TotalReturnAmount)
-                            </th>
-                        </tr>
-                    </thead>
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.UserName)
+                                </th>
 
-                    <tbody>
-                        <!-- Dispute Modal -->
-                        @{Html.RenderPartial("_FilteredReportTable"); }
-                        <!-- end: Dispute Modal -->
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="6">Total</th>
-                            <th>2</th>
-                            <th>4</th>
-                        </tr>
-                    </tfoot>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.AccountID)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.RetailerName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Company)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.RetailerAddress)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.PublicationDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.TotalDistributionAmount)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.TotalReturnAmount)
+                                </th>
+                            </tr>
+                        </thead>
 
-                </table>
-                    </div>
+                        <tbody>
+                            <!-- Dispute Modal -->
+                            @{Html.RenderPartial("_FilteredReportTable"); }
+                            <!-- end: Dispute Modal -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="6">Total</th>
+                                <th>2</th>
+                                <th>4</th>
+                            </tr>
+                        </tfoot>
+
+                    </table>
+
+                </div>
             </div>
         </div>
     </div>
@@ -126,7 +129,22 @@
             //order: [[1, 'desc']],
             pageLength: 30,
             dom: '<"row pb-3"<"col-lg-6"B><"col-lg-6"f>>tip', // Customized layout for DataTable components
-            buttons: [ 'excel', 'print' ],
+            buttons: [
+                {
+                extend: 'excel',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            {
+                extend: 'print',
+                exportOptions: {
+                    columns: ':visible',
+                    stripHtml: false // Include HTML content, like the footer, when printing
+                }
+            },
+                'colvis',
+            ],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
 
@@ -161,12 +179,8 @@
                 // Update footer
                 $(api.column(6).footer()).html(drawtotal);
                 $(api.column(7).footer()).html(rettotal);
-                 // Update the footer
-                //api.column(6).footer().innerHTML = pageTotal + ' (' + total + ' total)';
             },
 
         });
-
-       
     });
 </script>

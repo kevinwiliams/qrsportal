@@ -46,6 +46,9 @@ namespace QRSPortal2.Controllers
 
                 ViewBag.Supervisors = supervisorList;
 
+                _ac.InitializeController(this.Request.RequestContext);
+                ViewData["UserName"] = _ac.GetUserData()["UserName"];
+
                 return View(result);
 
             }
@@ -63,6 +66,7 @@ namespace QRSPortal2.Controllers
         {
             try
             {
+
                 // SQL query without filtering conditions initially
                 var sql = @"
                     SELECT [UserName]
@@ -122,6 +126,9 @@ namespace QRSPortal2.Controllers
 
                 // Execute the SQL query with parameters
                 var result = _db.Database.SqlQuery<SupervisorReport>(sql, parameters.ToArray()).ToList();
+                
+                _ac.InitializeController(this.Request.RequestContext);
+                ViewData["UserName"] = _ac.GetUserData()["UserName"];
 
                 return View(result);
             }
