@@ -1,0 +1,196 @@
+﻿@model IEnumerable<QRSPortal2.Models.TransactionsReport>
+
+@{
+    ViewBag.Title = "Transactions Report";
+}
+
+<section class="section dashboard">
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Transactions Report</h5>
+                    @using (Html.BeginForm("transactions", "report", FormMethod.Post, new { @name = "transactionReport" }))
+                    {
+                        <div class="row pb-3">
+                            <div class="col-lg-3 col-md-6 form-group">
+                                @Html.Label("Publish Start Date:")
+                                @Html.TextBox("startDate", null, new { @class = "form-control form-control-sm datepicker", @type = "date", @required = "required" })
+                            </div>
+                            <div class="col-lg-3 col-md-6 form-group">
+                                @Html.Label("Publish End Date:")
+                                @Html.TextBox("endDate", null, new { @class = "form-control form-control-sm datepicker", @type = "date", @required = "required" })
+                            </div>
+                            <div class="col-lg-3 col-md-6 form-group">
+                                @Html.Label("Status:")
+                                <select class="form-select form-select-sm" aria-label="Status" name="pubStatus" id="pubStatus">
+                                    <option value="">All</option>
+                                    <option value="Open">Open</option>
+                                    <option value="Closed">Closed</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-6 form-group">
+                                <button id="filterBtn" type="submit" class="btn btn-primary btn-sm mt-4">Filter</button>
+                            </div>
+
+                        </div>
+                    }
+                    <table class="table small dtTransReport" id="dtTransReport">
+                        <caption id="dateRange">
+                            <span class="small">User: @ViewData["UserName"] / @User.Identity.Name / @DateTime.Now</span>
+                            @*<strong>From:</strong> <span id="sDate"></span> - <strong>To:</strong> <span id="eDate"></span>*@
+
+                        </caption>
+                        <thead>
+                            <tr>
+
+                                <th>
+                                    @Html.DisplayNameFor(model => model.AccountID)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.RetailerName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Company)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.RetailerAddress)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.PublicationDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.TotalDistributionAmount)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.TotalReturnAmount)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.TotalConfirmedAmount)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.CreatedAt)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Status)
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <!-- Dispute Modal -->
+                            @{Html.RenderPartial("_FilteredTranxTable"); }
+                            <!-- end: Dispute Modal -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="6">Total</th>
+                                <th>2</th>
+                                <th>4</th>
+                            </tr>
+                        </tfoot>
+
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@Scripts.Render("~/bundles/jquery")
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
+<script>
+    $('[name=startDate]').change(function (e) {
+        var s = $(this).val();
+        var sDate = moment(s).format('LL');
+        $('#sDate').html(sDate);
+    });
+
+    $('[name=endDate]').change(function (e) {
+        var d = $(this).val();
+        var eDate = moment(d).format('LL');
+        $('#eDate').html(eDate);
+    });
+
+    // Submit form on button click
+    $('#filterBtn').click(function (e) {
+        e.preventDefault();
+        var startDate = $('[name=startDate]').val();
+        var endDate = $('[name=endDate]').val();
+
+        //if (startDate == '' || endDate == '') {
+        //    alert('Please select a start and end date.');
+        //    return false;
+        //}
+
+        if (moment(startDate).isAfter(endDate)) {
+            alert('The end date must be after the start date.');
+            return false;
+        }
+
+        // Submit form
+        $('[name=transactionReport]').submit();
+    });
+
+    $(document).ready(function () {
+        $('.dtTransReport').DataTable({
+            //order: [[1, 'desc']],
+            pageLength: 30,
+            dom: '<"row pb-3"<"col-lg-6"B><"col-lg-6"f>>tip', // Customized layout for DataTable components
+            buttons: [
+                {
+                extend: 'excel',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            {
+                extend: 'print',
+                exportOptions: {
+                    columns: ':visible',
+                    stripHtml: false // Include HTML content, like the footer, when printing
+                }
+            },
+                'colvis',
+            ],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api(), data;
+
+                // Remove the formatting to get integer data for summation
+                var intVal = function (i) {
+                    return typeof i === 'string' ? i.replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
+                };
+
+                // Total over all pages
+                var drawtotal = api
+                    .column(6)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                var rettotal = api
+                    .column(7)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                // Total over this page
+                var pageTotal = api
+                    .column(6, { page: 'current' })
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                // Update footer
+                $(api.column(6).footer()).html(drawtotal);
+                $(api.column(7).footer()).html(rettotal);
+            },
+
+        });
+    });
+</script>

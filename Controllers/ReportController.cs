@@ -59,9 +59,7 @@ namespace QRSPortal2.Controllers
                 return View();
             }
         }
-
-
-
+               
         [HttpPost]
         public ActionResult Supervisor(string supervisors, DateTime? startDate, DateTime? endDate)
         {
@@ -142,6 +140,106 @@ namespace QRSPortal2.Controllers
             
         }
 
+        public ActionResult Transactions()
+        {
+            try
+            {
+                var sql = @"SELECT TOP 30
+                              [AccountID]
+                              ,[RetailerName]
+                              ,[Company]
+                              ,[RetailerAddress]
+                              ,[PublicationDate]
+                              ,[TotalReturnAmount]
+                              ,[TotalConfirmedAmount]
+                              ,[TotalDistributionAmount]
+                              ,[CreatedAt]
+                              ,[Status]
+                          FROM [QRS_DB].[dbo].[View_Transactions_Report]";
+
+                var result = _db.Database.SqlQuery<TransactionsReport>(sql).ToList();
+
+                _ac.InitializeController(this.Request.RequestContext);
+                ViewData["UserName"] = _ac.GetUserData()["UserName"];
+
+                return View(result);
+
+            }
+            catch (Exception ex)
+            {
+                Util.LogError(ex);
+                return View();
+            }
+        }
+
+        [HttpPost]
+        public ActionResult Transactions(string pubStatus, DateTime? startDate, DateTime? endDate)
+        {
+            try
+            {
+
+                // SQL query without filtering conditions initially
+                var sql = @"
+                    SELECT 
+                          [AccountID]
+                          ,[RetailerName]
+                          ,[Company]
+                          ,[RetailerAddress]
+                          ,[PublicationDate]
+                          ,[TotalReturnAmount]
+                          ,[TotalConfirmedAmount]
+                          ,[TotalDistributionAmount]
+                          ,[CreatedAt]
+                          ,[Status]
+                    FROM [QRS_DB].[dbo].[View_Transactions_Report]";
+
+                // List to store SQL parameters
+                var parameters = new List<SqlParameter>();
+
+                // Check if supervisor name is provided
+                if (!string.IsNullOrEmpty(pubStatus))
+                {
+                    sql += " WHERE [Status] = @status";
+                    parameters.Add(new SqlParameter("@status", pubStatus));
+                }
+
+                // Check if start date is provided
+                if (startDate.HasValue)
+                {
+                    if (parameters.Any())
+                        sql += " AND [PublicationDate] >= @startDate";
+                    else
+                        sql += " WHERE [PublicationDate] >= @startDate";
+
+                    parameters.Add(new SqlParameter("@startDate", startDate.Value));
+                }
+
+                // Check if end date is provided
+                if (endDate.HasValue)
+                {
+                    if (parameters.Any())
+                        sql += " AND [PublicationDate] <= @endDate";
+                    else
+                        sql += " WHERE [PublicationDate] <= @endDate";
+
+                    parameters.Add(new SqlParameter("@endDate", endDate.Value));
+                }
+
+                // Execute the SQL query with parameters
+                var result = _db.Database.SqlQuery<TransactionsReport>(sql, parameters.ToArray()).ToList();
+
+                _ac.InitializeController(this.Request.RequestContext);
+                ViewData["UserName"] = _ac.GetUserData()["UserName"];
+
+                return View(result);
+            }
+            catch (Exception ex)
+            {
+                Util.LogError(ex);
+                return View();
+            }
+
+        }
 
         // GET: Report/Details/5
         public ActionResult Details(int id)

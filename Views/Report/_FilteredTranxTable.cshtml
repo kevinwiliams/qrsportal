@@ -1,0 +1,17 @@
+﻿@model IEnumerable<QRSPortal2.Models.TransactionsReport>
+
+@foreach (var item in Model)
+{
+    <tr>
+        <td>@Html.DisplayFor(modelItem => item.AccountID)</td>
+        <td>@Html.DisplayFor(modelItem => item.RetailerName)</td>
+        <td>@Html.DisplayFor(modelItem => item.Company)</td>
+        <td>@Html.DisplayFor(modelItem => item.RetailerAddress)</td>
+        <td>@Html.DisplayFor(modelItem => item.PublicationDate)</td>
+        <td>@Html.DisplayFor(modelItem => item.TotalDistributionAmount)</td>
+        <td>@Html.DisplayFor(modelItem => item.TotalReturnAmount)</td>
+        <td>@Html.DisplayFor(modelItem => item.TotalConfirmedAmount)</td>
+        <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
+        <td>@Html.DisplayFor(modelItem => item.Status)</td>
+    </tr>
+}
