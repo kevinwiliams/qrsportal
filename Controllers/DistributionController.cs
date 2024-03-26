@@ -68,7 +68,7 @@ namespace QRSPortal2.Controllers
 
                 if (!isLoaded) {
 
-                    var startDate = "2024-01-01";
+                    var startDate = "2023-11-01";
                     var endDate = DateTime.Now.ToString("yyyy-MM-dd");
                     await _ac.LoadTransactions(id, startDate, endDate);
                 }

@@ -684,6 +684,7 @@ namespace QRSPortal2.Controllers
                         var context = new ApplicationDbContext();
                         var json = await response.Content.ReadAsStringAsync();
                         var resultTrans = JsonConvert.DeserializeObject<List<CircProDistribution>>(json);
+                        var status = "";
 
                         foreach (var item in resultTrans)
                         {
@@ -692,6 +693,8 @@ namespace QRSPortal2.Controllers
 
                             if (circUser != null)
                             {
+                                status = (item.PUBLISH < DateTime.Now.AddDays(-30)) ? "Closed" : "Open";
+
                                 CircProTransactions circProTransactions = new CircProTransactions
                                 {
                                     UserID = circUser.UserID,
@@ -702,7 +705,7 @@ namespace QRSPortal2.Controllers
                                     ConfirmReturn = true,
                                     CreatedAt = item.PUBLISH,
                                     UpdatedAt = DateTime.Now,
-                                    Status = "Open",
+                                    Status = status,
                                     EmailAddress = circUser.EmailAddress,
                                     ReturnAmount = item.RETTOT,
                                     ReturnDate = item.PUBLISH,
