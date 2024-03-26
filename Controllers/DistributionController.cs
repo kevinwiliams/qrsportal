@@ -197,29 +197,31 @@ namespace QRSPortal2.Controllers
                     {
                         _db.Entry(pubEntry).State = System.Data.Entity.EntityState.Modified;
 
-                        returnCount = Convert.ToInt32(returnAmount);
+                        if (userRole == "Retailer")
+                        {
+                            returnCount = Convert.ToInt32(returnAmount);
+                            pubEntry.ReturnAmount = returnCount;
+                            pubEntry.Status = retStatus;
+                            pubEntry.ReturnDate = DateTime.Now;
+                            pubEntry.UpdatedAt = DateTime.Now;
 
-                        pubEntry.ReturnAmount = returnCount;
-                        pubEntry.Status = retStatus;
-                        pubEntry.ReturnDate = DateTime.Now;
-                        pubEntry.UpdatedAt = DateTime.Now;
-                        //load email variable
-                        distributionData.ReturnAmount = returnCount;
-                        subject = "QRS Returns Notification - " + accountId;
-                        body = RenderViewToString(this.ControllerContext, "~/Views/Emails/ConfirmReturnRetailer.cshtml", distributionData);
-
+                            //load email variable
+                            distributionData.ReturnAmount = returnCount;
+                            subject = "QRS Returns Notification - " + accountId;
+                            body = RenderViewToString(this.ControllerContext, "~/Views/Emails/ConfirmReturnRetailer.cshtml", distributionData);
+                        }
 
                         if (userRole != "Retailer")
                         {
-                            returnCount = Convert.ToInt32(confirmAmount);
-
                             retStatus = "Closed";
 
+                            returnCount = Convert.ToInt32(confirmAmount);
                             pubEntry.ConfirmedAmount = returnCount;
                             pubEntry.ConfirmDate = DateTime.Now;
                             pubEntry.UpdatedAt = DateTime.Now;
                             pubEntry.Status = retStatus;
                             pubEntry.ConfirmReturn = true;
+
                             //load email variable
                             distributionData.ConfirmedAmount = Convert.ToInt32(confirmAmount);
                             subject = "QRS Returns Closed Confirmation - " + accountId;
